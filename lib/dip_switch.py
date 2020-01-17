@@ -6,7 +6,7 @@ Communicate with dual inline package (DIP) switches.
 import RPi.GPIO as GPIO
     # TODO: Document installing module `Rpi` in a virtual environment,
     #     probably in a general "setup" document.
-import time
+
 GPIO.setmode(GPIO.BCM)
     # TODO: Should this be done here, or in functions, or at a global level?
 
