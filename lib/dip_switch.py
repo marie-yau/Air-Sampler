@@ -1,18 +1,31 @@
+"""
+Communicate with dual inline package (DIP) switches.
+"""
+
+
 import RPi.GPIO as GPIO
 import time
 GPIO.setmode(GPIO.BCM)
 
-"""
-Purpose: Convert signals from DIP switch to a binary number that is used as ID of sampler.
-Parameters: DIP_switch (array of 8 integers)
-            - contains numbers of GPIO that the DIP switch is connected to (refer to Raspberry Pi layout)
-            - DIP_switch[0] is DIP switch pin number 1,..., DIP_switch[7] is DIP switch pin number 8
-            - DIP_switch array is read from left to right
-              - e.g. array [26(off), 19(on), 13(off), 6(on), 5(on), 21(off), 20(on), 16(off)] is converted to 01011010 in binary
-Returns: binary (string)
-            - string representing a binary number that was converted from DIP_switch array
-"""
+
 def get_ID_of_sampler_in_binary(DIP_switch):
+    """
+    Convert signals from DIP switch to a binary number that is used as ID of sampler.
+
+    Parameters:
+
+    + `DIP_switch`
+        + Array of 8 integers.
+        + Contains numbers of GPIO that the DIP switch is connected to (refer to Raspberry Pi layout).
+        + `DIP_switch[0]` is DIP switch pin number 1, ..., `DIP_switch[7]` is DIP switch pin number 8.
+        + `DIP_switch` array is read from left to right.
+            E.g., array [26(off), 19(on), 13(off), 6(on), 5(on), 21(off), 20(on), 16(off)] is converted to 01011010 in binary
+
+    Returns: binary (string)
+
+    + String representing a binary number that was converted from DIP_switch array
+    """
+
     # set up pins, default for the pin is high
     GPIO.setup(DIP_switch[0], GPIO.IN, pull_up_down = GPIO.PUD_UP)
     GPIO.setup(DIP_switch[1], GPIO.IN, pull_up_down = GPIO.PUD_UP)
@@ -36,17 +49,25 @@ def get_ID_of_sampler_in_binary(DIP_switch):
     # return binary number as a string
     return binary
 
-"""
-Purpose: Convert signals from DIP switch to a decimal number that is used as ID of sampler.
-Parameters: DIP_switch (array of 8 integers)
-            - contains numbers of GPIO that the DIP switch is connected to (refer to Raspberry Pi layout)
-            - DIP_switch[0] is DIP switch pin number 1,..., DIP_switch[7] is DIP switch pin number 8
-            - DIP_switch array is read from left to right
-              - e.g. array [26(off), 19(on), 13(off), 6(on), 5(on), 21(off), 20(on), 16(off)] is 01011010 in binary, function converts it to 90 in decimal
-Returns: decimal_number (string)
-            - string representing a decimal number that was converted from DIP_switch array
-"""
+
 def get_ID_of_sampler_in_decimal(DIP_switch):
+    """
+    Convert signals from DIP switch to a decimal number that is used as ID of sampler.
+
+    Parameters:
+
+    + `DIP_switch`
+        + Array of 8 integers.
+        + Contains numbers of GPIO that the DIP switch is connected to (refer to Raspberry Pi layout).
+        + `DIP_switch[0]` is DIP switch pin number 1, ..., `DIP_switch[7]` is DIP switch pin number 8.
+        + `DIP_switch` array is read from left to right.
+            E.g., array [26(off), 19(on), 13(off), 6(on), 5(on), 21(off), 20(on), 16(off)] is 01011010 in binary, function converts it to 90 in decimal
+
+    Returns: decimal_number (string)
+
+    + String representing a decimal number that was converted from DIP_switch array
+    """
+
     # get binary number from DIP_switch array
     binary_string = get_ID_of_sampler_in_binary(DIP_switch)
     # convert the binary number to decimal
