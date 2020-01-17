@@ -1,0 +1,6 @@
+# Ignore Python bytecode files.
+__pycache__
+*.pyc
+
+# Ignore Mac OS-X folder attribute files.
+.DS_Store
