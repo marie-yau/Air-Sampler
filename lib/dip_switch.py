@@ -4,8 +4,11 @@ Communicate with dual inline package (DIP) switches.
 
 
 import RPi.GPIO as GPIO
+    # TODO: Document installing module `Rpi` in a virtual environment,
+    #     probably in a general "setup" document.
 import time
 GPIO.setmode(GPIO.BCM)
+    # TODO: Should this be done here, or in functions, or at a global level?
 
 
 def get_ID_of_sampler_in_binary(DIP_switch):
@@ -25,6 +28,13 @@ def get_ID_of_sampler_in_binary(DIP_switch):
 
     + String representing a binary number that was converted from DIP_switch array
     """
+    # TODO: Rename this function, to show its generality.
+    #     It reads switch positions.
+    #     The fact that the intended application is to get a sampler ID, is coincidental.
+
+    # TODO: Understand and document whether this relates to a literal DIP switch.
+    #     It seems to be reading general-purpose IO pins on the RPi.
+    #     Whether those are set via a DIP switch isn't rel
 
     # set up pins, default for the pin is high
     GPIO.setup(DIP_switch[0], GPIO.IN, pull_up_down = GPIO.PUD_UP)
@@ -35,6 +45,7 @@ def get_ID_of_sampler_in_binary(DIP_switch):
     GPIO.setup(DIP_switch[5], GPIO.IN, pull_up_down = GPIO.PUD_UP)
     GPIO.setup(DIP_switch[6], GPIO.IN, pull_up_down = GPIO.PUD_UP)
     GPIO.setup(DIP_switch[7], GPIO.IN, pull_up_down = GPIO.PUD_UP)
+
     # get GPIOs' inputs as true and false, convert them to strings of either 1 or 0
     input_0 = str(int(GPIO.input(DIP_switch[0])))
     input_1 = str(int(GPIO.input(DIP_switch[1])))
@@ -44,9 +55,11 @@ def get_ID_of_sampler_in_binary(DIP_switch):
     input_5 = str(int(GPIO.input(DIP_switch[5])))
     input_6 = str(int(GPIO.input(DIP_switch[6])))
     input_7 = str(int(GPIO.input(DIP_switch[7])))
+
     # concatenate the strings representing the GPIOs' inputs
+    # TODO: Do this, as part of the assignments above, in a loop over items of `DIP_switch`.
     binary = input_0 + input_1 + input_2 + input_3 + input_4 + input_5 + input_6 + input_7
-    # return binary number as a string
+
     return binary
 
 
@@ -67,15 +80,40 @@ def get_ID_of_sampler_in_decimal(DIP_switch):
 
     + String representing a decimal number that was converted from DIP_switch array
     """
+    # TODO: Rename this function, to show its generality.
+    #     It reads switch positions, and munges the results.
+    #     The fact that the intended application is to get a sampler ID, is coincidental.
+
+    # TODO: Return a decimal number.
+    #     Caller can turn that into a string as desired (will be done
+    #     automatically most places you'd want to do that, anyway).
 
     # get binary number from DIP_switch array
+    # TODO: Don't call `get_ID_of_sampler_in_binary()` here.
+    #     There's no need to inter-mingle the functions this way.
+    #     + Should have one function to read switches.  It can return a binary number.
+    #     + Then have a function, like this one, that turns the binary number into
+    #         a decimal.  And arguably that function wouldn't be in this module,
+    #         since it's not specific to DIP switches.
+    #     One advantage to refactoring functions that way is it would make this
+    #     function easy to test, even if don't have an RPi connected.
+    #     In other words, want as many functions as possible to avoid connections to hardware,
+    #     since that makes them easier to test.
     binary_string = get_ID_of_sampler_in_binary(DIP_switch)
+
     # convert the binary number to decimal
+    # TODO: If `get_ID_of_sampler_in_binary()` returned a true binary number,
+    #     rather than as a string,
+    #     then could do this more easily.
     decimal_number = 0
     factor = 1
     for i in range(8):
         digit = int(binary_string[i])
         decimal_number += digit * factor
         factor *= 2
+
     # return decimal number as a string
-    return str(decimal_number)    
+    return str(decimal_number)
+
+
+# TODO: Add a `__main__` here, for testing.
