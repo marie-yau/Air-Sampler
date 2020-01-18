@@ -36,15 +36,23 @@ def get_ID_of_sampler_in_binary(DIP_switch):
     #     It seems to be reading general-purpose IO pins on the RPi.
     #     Whether those are set via a DIP switch isn't rel
 
-    # set up pins, default for the pin is high
-    GPIO.setup(DIP_switch[0], GPIO.IN, pull_up_down = GPIO.PUD_UP)
-    GPIO.setup(DIP_switch[1], GPIO.IN, pull_up_down = GPIO.PUD_UP)
-    GPIO.setup(DIP_switch[2], GPIO.IN, pull_up_down = GPIO.PUD_UP)
-    GPIO.setup(DIP_switch[3], GPIO.IN, pull_up_down = GPIO.PUD_UP)
-    GPIO.setup(DIP_switch[4], GPIO.IN, pull_up_down = GPIO.PUD_UP)
-    GPIO.setup(DIP_switch[5], GPIO.IN, pull_up_down = GPIO.PUD_UP)
-    GPIO.setup(DIP_switch[6], GPIO.IN, pull_up_down = GPIO.PUD_UP)
-    GPIO.setup(DIP_switch[7], GPIO.IN, pull_up_down = GPIO.PUD_UP)
+    # Loop over pins.
+    # TODO: Test.
+    #     This for-loop results from a refactoring that was done without hardware for testing.
+    for pin_num in DIP_switch:
+
+        # Set up pin.  Default is high.
+        # TODO: Consider breaking this out into its own function.
+        #     Presumably only need to do this once, say, at time device gets initialized.
+        #     And might want to read switch positions multiple times.
+        #     A clean way to do this would be to create a class that encapsulates the
+        #     `DIP_switch` array.
+        #     When you instantiate the class, in `__init__()`, it checks for errors,
+        #     then conditions the pins.
+        #     Errors would be things like no pins in array, bad (physically-impossible) pin numbers, and repeated pins.
+        #     Then the class would have a method to read the pins and return a binary
+        #     representation of their status.
+        GPIO.setup(pin_num, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
     # get GPIOs' inputs as true and false, convert them to strings of either 1 or 0
     input_0 = str(int(GPIO.input(DIP_switch[0])))
