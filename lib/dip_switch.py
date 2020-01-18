@@ -39,6 +39,7 @@ def get_ID_of_sampler_in_binary(DIP_switch):
     # Loop over pins.
     # TODO: Test.
     #     This for-loop results from a refactoring that was done without hardware for testing.
+    binary_digits = []
     for pin_num in DIP_switch:
 
         # Set up pin.  Default is high.
@@ -54,19 +55,13 @@ def get_ID_of_sampler_in_binary(DIP_switch):
         #     representation of their status.
         GPIO.setup(pin_num, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
-    # get GPIOs' inputs as true and false, convert them to strings of either 1 or 0
-    input_0 = str(int(GPIO.input(DIP_switch[0])))
-    input_1 = str(int(GPIO.input(DIP_switch[1])))
-    input_2 = str(int(GPIO.input(DIP_switch[2])))
-    input_3 = str(int(GPIO.input(DIP_switch[3])))
-    input_4 = str(int(GPIO.input(DIP_switch[4])))
-    input_5 = str(int(GPIO.input(DIP_switch[5])))
-    input_6 = str(int(GPIO.input(DIP_switch[6])))
-    input_7 = str(int(GPIO.input(DIP_switch[7])))
+        # Get input as `True` or `False`, and convert to string '1' or '0'.
+        bit_str = str(int(GPIO.input(pin_num)))
+            # TODO: Try `bit_str = '1' if GPIO.input(pin_num) is True else '0'`
+        binary_digits.append(bit_str)
 
     # concatenate the strings representing the GPIOs' inputs
-    # TODO: Do this, as part of the assignments above, in a loop over items of `DIP_switch`.
-    binary = input_0 + input_1 + input_2 + input_3 + input_4 + input_5 + input_6 + input_7
+    binary = ''.join(binary_digits)
 
     return binary
 
