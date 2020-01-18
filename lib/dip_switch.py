@@ -36,10 +36,9 @@ def get_ID_of_sampler_in_binary(DIP_switch):
     #     It seems to be reading general-purpose IO pins on the RPi.
     #     Whether those are set via a DIP switch isn't rel
 
-    # Loop over pins.
+    # Condition pins.
     # TODO: Test.
     #     This for-loop results from a refactoring that was done without hardware for testing.
-    binary_digits = []
     for pin_num in DIP_switch:
 
         # Set up pin.  Default is high.
@@ -55,10 +54,12 @@ def get_ID_of_sampler_in_binary(DIP_switch):
         #     representation of their status.
         GPIO.setup(pin_num, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
-        # Get input as `True` or `False`, and convert to string '1' or '0'.
-        bit_str = str(int(GPIO.input(pin_num)))
-            # TODO: Try `bit_str = '1' if GPIO.input(pin_num) is True else '0'`
-        binary_digits.append(bit_str)
+    # Get inputs, as strings '1' or '0'.
+    binary_digits = [
+        str(int(GPIO.input(pin_num)))
+            # TODO: Try `'1' if GPIO.input(pin_num) is True else '0'`
+        for pin_num in DIP_switch
+        ]
 
     # concatenate the strings representing the GPIOs' inputs
     binary = ''.join(binary_digits)
