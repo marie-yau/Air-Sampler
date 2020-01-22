@@ -4,8 +4,21 @@ Read dual inline package (DIP) switches.
 
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
+    # TODO: This probably shouldn't get set here.
+    #     The user should be able to decide whether to use
+    #     board numbering (pin numbers on the RPi header)
+    #     or BCM numbering (channel numbers on Broadcom SOC).
+    #     Then user provides consistent numbers when instantiate a DIPSwitch object.
+    #     The problem with setting it here is that some other bit of code
+    #     may use board numbering, via `GPIO.setmode(GPIO.BOARD)`.
+    #     This could create bugs that only emerge when the two modules are loaded together.
 
 class DIPSwitch():
+    """
+    Read dual inline package (DIP) switches.
+    """
+    # TODO: Add a `__del__()` method, that performs cleanup like:
+    #     GPIO.cleanup(self.dip_switch_pin_numbers)
 
     def __init__(self, dip_switch_pin_numbers):
         # TODO: Document expected values for `dip_switch_pin_numbers`.
@@ -17,14 +30,19 @@ class DIPSwitch():
         #     for pin_num in dip_switch_pin_numbers:
         #         assert( isinstance(pin_num, int) )
         #         assert( pin_num in [<list of valid pin numbers for RPi logical input>] )
+        #         assert( GPIO.gpio_function(pin_num) in [GPIO.IN, GPIO.UNKNOWN] )
         self.dip_switch_pin_numbers = dip_switch_pins
-            # TODO: Consider copying `dip_switch_pins` in case caller mutates it for some reason.
+            # TODO: `dip_switch_pins` should be `dip_switch_pin_numbers`.
+            # TODO: Consider copying `dip_switch_pin_numbers` in case caller mutates it for some reason.
 
     def read_switch_positions(self):
         # set up pins as inputs
         [GPIO.setup(pin_num, GPIO.IN, pull_up_down = GPIO.PUD_UP) for pin_number in self.dip_switch_pin_numbers]
             # TODO: This looks like a setup step, that configures the hardware.
             #     If so, it could be done once, and therefore could be moved to `__init__()`.
+            # TODO: Try the following list-oriented call
+            #     (see https://sourceforge.net/p/raspberry-gpio-python/wiki/BasicUsage/):
+            #     GPIO.setup(dip_switch_pin_numbers, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         self.switch_positions = ["1" if GPIO.input(pin) else "0" for pin in self.dip_switch_pin_numbers]
 
     def get_switch_position(self, index):
