@@ -1,6 +1,6 @@
 # Hardware setup
 
-## Set up Raspberry Pi=
+## Set up Raspberry Pi
 ### Using monitor and keyboard
  1. Intall balenaEtcher (https://www.balena.io/etcher/).
  2. Download latest version of Raspbian (https://www.raspberrypi.org/downloads/raspbian/).
