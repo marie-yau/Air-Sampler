@@ -11,7 +11,7 @@ class DIPSwitch():
     
     def read_switch_positions(self):
         # set up pins as inputs
-        [GPIO.setup(pin_num, GPIO.IN, pull_up_down = GPIO.PUD_UP) for pin_number in self.dip_switch_pin_numbers]
+        [GPIO.setup(pin_number, GPIO.IN, pull_up_down = GPIO.PUD_UP) for pin_number in self.dip_switch_pin_numbers]
         self.switch_positions = ["1" if GPIO.input(pin) else "0" for pin in self.dip_switch_pin_numbers]
         
     def get_switch_position(self, index):
