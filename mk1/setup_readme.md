@@ -1,17 +1,31 @@
 # Hardware setup
 
-## Set up Raspberry Pi
+## Set up Raspberry Pi=
+### Using monitor and keyboard
+ 1. Intall balenaEtcher (https://www.balena.io/etcher/).
+ 2. Download latest version of Raspbian (https://www.raspberrypi.org/downloads/raspbian/).
+ 3. Connect SD card to the computer and mount the Raspbian image to the SD card using balenaEtcher.
+ 4. Insert SD card to the Raspberry Pi.
+ 5. Connect monitor, mouse, keyboard, Wi-Fi module and charger to the ports of Raspberry Pi.
 
-### Install operating system
+### Headless using ethernet cable
+1. Mount the Raspbian image to the SD card using balenaEtcher.
+2. Create ```ssh``` files in ```boot``` drive to allow ssh.
 
-1. Install [balenaEtcher](https://www.balena.io/etcher/).
-2. Download latest version of [Raspbian](https://www.raspberrypi.org/downloads/raspbian/).
-3. Connect SD card to the computer and mount the Raspbian image to the SD card using balenaEtcher.
-4. Insert SD card to the Raspberry Pi.
+    ```touch /Volumes/boot/ssh```
+    
+3. Connect one end of ethernet cable to Raspberry Pi and the other end to your computer.
+4. Find the IP address of Raspberry Pi using ```ping``` command.
 
-### Connect accessories
+    ```ping raspberrypi.local```
 
-Connect monitor, mouse, keyboard, Wi-Fi module and charger to the ports of Raspberry Pi.
+5. ssh into the Raspberry Pi. Replace ```pi``` with your Pi's username (default username is ```pi```) and ```IP``` with the IP address.
+
+    ```ssh pi@IP```
+    
+    Answer ```yes``` to question ```Are you sure you want to continue connecting?``` and enter your password (default password is ```raspberry```).
+    
+    
 
 ## Configure real time clock
 
