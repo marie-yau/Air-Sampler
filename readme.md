@@ -16,7 +16,7 @@ David Lorenzetti,
 Randy Maddelena,
 Marion Russell,
 and
-Maria Yau.
+Marie Yau.
 
 The project is supported in part by the Defense Threat Reduction Agency.
 
