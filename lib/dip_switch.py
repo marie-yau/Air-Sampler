@@ -1,27 +1,60 @@
 """
-Communicate with dual inline package (DIP) switches.
+Read dual inline package (DIP) switches.
 """
 
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
+    # TODO: This probably shouldn't get set here.
+    #     The user should be able to decide whether to use
+    #     board numbering (pin numbers on the RPi header)
+    #     or BCM numbering (channel numbers on Broadcom SOC).
+    #     Then user provides consistent numbers when instantiate a DIPSwitch object.
+    #     The problem with setting it here is that some other bit of code
+    #     may use board numbering, via `GPIO.setmode(GPIO.BOARD)`.
+    #     This could create bugs that only emerge when the two modules are loaded together.
 
 class DIPSwitch():
+    """
+    Read dual inline package (DIP) switches.
+    """
+    # TODO: Add a `__del__()` method, that performs cleanup like:
+    #     GPIO.cleanup(self.dip_switch_pin_numbers)
+
     def __init__(self, dip_switch_pin_numbers):
+        # TODO: Document expected values for `dip_switch_pin_numbers`.
+        #     E.g., it's a list (possibly an iterable) with at least one integer,
+        #     integers give pin numbers for switches this instance will read,
+        #     and how pin numbers are ordered (high-to-low or low-to-high bits).
+        # TODO: Test `dip_switch_pin_numbers` against expectations, e.g.:
+        #     assert( len(dip_switch_pin_numbers) > 0 )
+        #     for pin_num in dip_switch_pin_numbers:
+        #         assert( isinstance(pin_num, int) )
+        #         assert( pin_num in [<list of valid pin numbers for RPi logical input>] )
+        #         assert( GPIO.gpio_function(pin_num) in [GPIO.IN, GPIO.UNKNOWN] )
         self.dip_switch_pin_numbers = dip_switch_pins
-    
+            # TODO: `dip_switch_pins` should be `dip_switch_pin_numbers`.
+            # TODO: Consider copying `dip_switch_pin_numbers` in case caller mutates it for some reason.
+
     def read_switch_positions(self):
         # set up pins as inputs
         [GPIO.setup(pin_number, GPIO.IN, pull_up_down = GPIO.PUD_UP) for pin_number in self.dip_switch_pin_numbers]
         self.switch_positions = ["1" if GPIO.input(pin) else "0" for pin in self.dip_switch_pin_numbers]
-        
+
     def get_switch_position(self, index):
+        # TODO: Make this method call `read_switch_positions()`.  See more extensive comments elsewhere.
         return self.switch_positions[index]
-    
+
     def get_switch_positions(self):
+        # TODO: Make this method call `read_switch_positions()`.
+        #     + The current design allows user to "get" positions when they haven't been "read" yet.
+        #         That means currently the user must remember to call "read" before doing a "get".
+        #         This places unfair burden on user.
+        #     + Any time a user calls a method that returns switch positions,
+        #         the switches should be read anew, in case they have changed.
+        #     + Then consider renaming the read method to `_read_switch_positions()`,
+        #         to show it's an internal utility method.
         return self.switch_positions
-    
-    def get_
-    
+
     def get_ID_of_sampler_in_binary(self, DIP_switch):
         """
         Convert signals from DIP switch to a binary number that is used as ID of sampler.
@@ -39,6 +72,12 @@ class DIPSwitch():
 
         + String representing a binary number that was converted from DIP_switch array
         """
+        # TODO: Make this method call `read_switch_positions()`.  See more extensive comments elsewhere.
+        #     If do that, then `DIP_switch` is unneeded method parameter.
+        #     Alternately, if want this to just be a function that takes switch values
+        #     and returns binary equivalent, then make it a static method on the class
+        #     (or move to a different module).
+
         # TODO: Rename this function, to show its generality.
         #     It reads switch positions.
         #     The fact that the intended application is to get a sampler ID, is coincidental.
@@ -95,6 +134,12 @@ class DIPSwitch():
 
         + String representing a decimal number that was converted from DIP_switch array
         """
+        # TODO: Make this method call `read_switch_positions()`.  See more extensive comments elsewhere.
+        #     If do that, then `DIP_switch` is unneeded method parameter.
+        #     Alternately, if want this to just be a function that takes switch values
+        #     and returns binary equivalent, then make it a static method on the class
+        #     (or move to a different module).
+
         # TODO: Rename this function, to show its generality.
         #     It reads switch positions, and munges the results.
         #     The fact that the intended application is to get a sampler ID, is coincidental.
@@ -131,4 +176,4 @@ class DIPSwitch():
         return str(decimal_number)
 
 
-    # TODO: Add a `__main__` here, for testing.
+# TODO: Add a `__main__` here, for testing.
