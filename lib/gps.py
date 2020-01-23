@@ -1,17 +1,11 @@
-import time
 import serial
-import string
-import RPi.GPIO as GPIO
-
-GPIO.setmode(GPIO.BCM)
 
 class GPS():
     def __init__(self):
         self._gpgga_info = "$GPGGA,"
         self._ser = serial.Serial("/dev/ttyAMA0")
-        self.get_current_coordinates()
 
-    def read_GPS_information(self):
+    def _read_GPS_information(self):
         while True:
             data_from_module = (str)(self._ser.readline())
             if data_from_module[0:7] == self._gpgga_info:
@@ -37,20 +31,24 @@ class GPS():
         return position
 
     def get_coordinates(self):
+        self._read_GPS_information()
         self.latitude_degrees = self._convert_nmea_to_degrees(self._nmea_latitude)
         self.longitude_degrees = self._convert_nmea_to_degrees(self._nmea_longitude)
         return self.latitude_degrees, self.latitude_direction, self.longitude_degrees, self.longitude_direction
 
     def get_time(self):
+        self._read_GPS_information()
         self.time = self._nmea_time[0:2] + ":" + self._nmea_time[2:4] + ":" + self._nmea_time[4:6]
         return self.time
 
-    def print_coordinates_and_time(self):
-        print("Time: ", self.time)
-        print("Latitude: ", self.latitude_degrees, " ", self.latitude_direction)
-        print("Longitude: ", self.longitude_degrees, " ", self.longitude_direction)
+    @staticmethod
+    def print_coordinates_and_time(time, latitude_degrees, latitude_direction, longitude_degrees, longitude_direction):
+        print("Time: ", time)
+        print("Latitude: ", latitude_degrees, " ", latitude_direction)
+        print("Longitude: ", longitude_degrees, " ", longitude_direction)
 
 if __name__ == "__main__":
     myGPS = GPS()
-    myGPS.read_GPS_information()
-    myGPS.print_coordinates_and_time()
+    latitude_degrees, latitude_direction, longitude_degrees, longitude_direction = myGPS.get_coordinates()
+    time = myGPS.get_time()
+    myGPS.print(time, latitude_degrees, latitude_direction, longitude_degrees, longitude_direction)
