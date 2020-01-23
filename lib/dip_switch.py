@@ -19,12 +19,15 @@ class DIPSwitch():
         """
         self._set_mode(mode)
         self.set_max_number_of_pins(40)
-        self._set_dip_switch_pin_numbers(dip_switch_pin_numbers)
+        self._set_dip_switch_pin_numbers(dip_switch_pin_numbers, self.mode)
 
     def _set_mode(self, mode):
         assert(mode == "BCM" or mode == "BOARD")
         self.mode = mode
-        GPIO.setmode(GPIO.mode)
+        if self.mode == "BCM":
+            GPIO.setmode(GPIO.BCM)
+        elif self.mode == "BOARD":
+            GPIO.setmode(GPIO.BOARD)
 
     def _set_dip_switch_pin_numbers(self, dip_switch_pin_numbers, mode):
         """
@@ -89,7 +92,7 @@ class DIPSwitch():
         GPIO.cleanup(self.dip_switch_pin_numbers)
 
 if __name__ == "__main__":
-    dip_switch_pin_numbers = []
+    dip_switch_pin_numbers = [26, 19, 13, 6, 5, 21, 20, 16]
     dip_switch = DIPSwitch(dip_switch_pin_numbers, "BCM")
     dip_switch_positions = dip_switch.get_switch_positions()
     decimal_number = dip_switch.convert_switch_positions_to_decimal_number(dip_switch_positions)
