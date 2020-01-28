@@ -26,7 +26,7 @@ class GPS():
         self._read_GPS_information()
         self.latitude_degrees = self.convert_nmea_to_degrees(self._nmea_latitude)
         self.longitude_degrees = self.convert_nmea_to_degrees(self._nmea_longitude)
-        self.time = self.convert_nmea_to_time(self._nmea_time)
+        self.time = self.convert_nmea_to_time(self._nmea_time[0:6])
         self.position = GeographicPosition(self.latitude_degrees, self.latitude_direction, self.longitude_degrees, self.longitude_direction, self.time)
         return self.position
 
@@ -37,20 +37,19 @@ class GPS():
             nmea_value = float(nmea_value)
         except(TypeError, ValueError):
             nmea_value = 0
-        decimal_value = nmea_value / 100.00
-        degrees = int(decimal_value)
-        minutes = (decimal_value - int(decimal_value)) / 60
-        position = degrees + minutes
-        position = "%.4f" % (position)
-        return position
+        degrees = int(nmea_value / 100.00)
+        minutes = (nmea_value - degrees * 100)
+        coordinate_in_degrees = degrees + minutes / 60
+        coordinate_in_degrees = round(coordinate_in_degrees, 6)
+        return coordinate_in_degrees
 
     @staticmethod
     def convert_nmea_to_time(nmea_time):
         assert(len(nmea_time) == 6)
-        assert(isinstance(nmea_time, str))
-        hours = nmea_time[0:2]
-        minutes = nmea_time[2:4]
-        seconds = nmea_time[4:6]
+        assert(isinstance(nmea_time, str) and nmea_time.isdigit())
+        hours = int(nmea_time[0:2])
+        minutes = int(nmea_time[2:4])
+        seconds = int(nmea_time[4:6])
         return time(hours, minutes, seconds)
 
 if __name__ == "__main__":
