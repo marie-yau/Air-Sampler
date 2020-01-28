@@ -1,3 +1,5 @@
+import RPi.GPIO as GPIO
+
 def set_board_numbering_mode(mode):
     """
     Set board numbering mode to either "BCM" or "BOARD".
