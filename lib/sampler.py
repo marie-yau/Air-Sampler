@@ -4,7 +4,6 @@ from pump import *
 from valve import *
 
 class Sampler():
-
     def __init__(self, pump_pin_number, bag_to_valve_pin_numbers_dict, mode):
         self.mode = mode
         self.set_pump(pump_pin_number)
@@ -15,7 +14,7 @@ class Sampler():
 
     def set_valves(self, bag_to_valve_pin_numbers_dict):
         self.bag_to_valve_objects_dict = {}
-        for bag in bag_to_valve_pin_numbers_dict.keys:
+        for bag in bag_to_valve_pin_numbers_dict.keys():
             self.bag_to_valve_objects_dict[bag] = Valve(bag_to_valve_pin_numbers_dict[bag], self.mode)
 
     def fill_bag(self, bag_number, duration):

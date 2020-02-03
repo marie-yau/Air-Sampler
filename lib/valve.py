@@ -1,4 +1,5 @@
 import RPi.GPIO as GPIO
+import time
 import settings
 import check
 
@@ -30,3 +31,11 @@ class Valve():
 
     def valve_is_open(self):
         return self.valve_open
+
+if __name__ == "__main__":
+    valve_pin_number = 17
+    numbering_mode = "BCM"
+    valve = Valve(valve_pin_number, numbering_mode)
+    valve.open_valve()
+    time.sleep(10)
+    valve.close_valve()
