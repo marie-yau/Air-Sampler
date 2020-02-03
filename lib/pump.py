@@ -27,5 +27,5 @@ class Pump():
         GPIO.output(self.pump_pin_number, 0)
         self.pump_on = False
 
-    def pump_is_pumping(self):
+    def is_pumping(self):
         return self.pump_on
