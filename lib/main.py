@@ -15,11 +15,12 @@ processes = []
 
 for bag_numbers, time_on, duration in schedule:
     while True:
-        if datetime.datetime.now().replace(microsecond=0) == time_on:
+        if datetime.now().replace(microsecond=0) == time_on:
+            print("now")
             for bag in bag_numbers:
                 process = Process(target=sampler.fill_bag, args=(bag, duration, ))
                 processes.append(process)
                 process.start()
             for proc in processes:
                 proc.join()
-                break
+            break
