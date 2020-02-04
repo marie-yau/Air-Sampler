@@ -17,12 +17,15 @@ class Sampler():
         for bag in bag_to_valve_pin_numbers_dict.keys():
             self.bag_to_valve_objects_dict[bag] = Valve(bag_to_valve_pin_numbers_dict[bag], self.mode)
 
-    def fill_bag(self, bag_number, duration):
+    def fill_bag(self, bag_number, duration, pump_delta, turn_pump_off_after_draw):
         self.pump.start_pumping()
+        time.sleep(pump_delta)
         self.bag_to_valve_objects_dict[bag_number].open_valve()
         time.sleep(duration)
         self.bag_to_valve_objects_dict[bag_number].close_valve()
-        self.pump.stop_pumping()
+        self.sleep(pump_delta)
+        if turn_pump_off_after_draw:
+            self.pump.stop_pumping()
 
 if __name__ == "__main__":
     bags_to_valve_pin_numbers_dict = {1: 17, 2: 22, 3: 10}

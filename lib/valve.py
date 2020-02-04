@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
 import time
 import settings
-import check
+import validate
 
 class Valve():
     __slots__ = ["valve_pin_number", "valve_open", "mode"]
@@ -13,7 +13,7 @@ class Valve():
         self.__valve_set_up()
 
     def set_valve_pin_number(self, valve_pin_number):
-        assert(check.is_valid_GPIO_pin_number(valve_pin_number, self.mode))
+        assert(validate.is_valid_GPIO_pin_number(valve_pin_number, self.mode))
         self.valve_pin_number = valve_pin_number
 
     def __valve_set_up(self):

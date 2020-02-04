@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO
 import settings
-import check
+import validate
 import time
 
 class Pump():
@@ -13,7 +13,7 @@ class Pump():
         self.__pump_set_up()
 
     def set_pump_pin_number(self, pump_pin_number):
-        assert(check.is_valid_GPIO_pin_number(pump_pin_number, self.mode))
+        assert(validate.is_valid_GPIO_pin_number(pump_pin_number, self.mode))
         self.pump_pin_number = pump_pin_number
 
     def __pump_set_up(self):
