@@ -14,9 +14,8 @@ pump_tolerance_seconds = 10
 
 
 # create `file_path` for `file_name` file that is stored in `main.py` file directory
-file_name = "sample.txt"
-file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "schedules", file_name)
-
+path = os.getcwd()
+file_path = os.path.abspath(os.path.join(path, os.pardir, "schedules", "sample.txt"))
 # create `schedule` object that reads sampler's schedule from a file
 schedules_for_sampler = SamplerSchedule(file_path, pump_starts_before, pump_ends_after, pump_tolerance_seconds)
 # create `sampler` object that operates valves and pump to fill bags
@@ -32,13 +31,17 @@ while True:
     current_time = datetime.now().replace(microsecond=0)
     if current_time == pump_time and pump_action == "start pump":
         sampler.turn_pump_on()
+        print(pump_action)
         pump_time, pump_action = next(pump_schedule)
     elif current_time == pump_time and pump_action == "stop pump":
         sampler.turn_pump_off()
+        print(pump_action)
         pump_time, pump_action = next(pump_schedule)
     elif current_time == valve_time and valve_action == "open valve":
         sampler.open_valve_for_bag(bag_number)
+        print(valve_action)
         bag_number, valve_time, valve_action = next(valves_schedule)
     elif current_time == valve_time and valve_action == "close valve":
         sampler.close_valve_for_bag(bag_number)
+        print(valve_action)
         bag_number, valve_time, valve_action = next(valves_schedule)
