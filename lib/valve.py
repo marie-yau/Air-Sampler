@@ -10,13 +10,13 @@ class Valve():
         settings.set_board_numbering_mode(mode)
         self.mode = mode
         self.set_valve_pin_number(valve_pin_number)
-        self.__valve_set_up()
+        self.__valve_setup()
 
     def set_valve_pin_number(self, valve_pin_number):
         assert(validate.is_valid_GPIO_pin_number(valve_pin_number, self.mode))
         self.valve_pin_number = valve_pin_number
 
-    def __valve_set_up(self):
+    def __valve_setup(self):
         GPIO.setup(self.valve_pin_number, GPIO.OUT)
         self.valve_open = False
 

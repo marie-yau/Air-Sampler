@@ -10,13 +10,13 @@ class Pump():
         settings.set_board_numbering_mode(mode)
         self.mode = mode
         self.set_pump_pin_number(pump_pin_number)
-        self.__pump_set_up()
+        self.__pump_setup()
 
     def set_pump_pin_number(self, pump_pin_number):
         assert(validate.is_valid_GPIO_pin_number(pump_pin_number, self.mode))
         self.pump_pin_number = pump_pin_number
 
-    def __pump_set_up(self):
+    def __pump_setup(self):
         GPIO.setup(self.pump_pin_number, GPIO.OUT)
         self.pump_on = False
 
