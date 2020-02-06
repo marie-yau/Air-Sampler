@@ -31,17 +31,25 @@ while True:
     current_time = datetime.now().replace(microsecond=0)
     if current_time == pump_time and pump_action == "start pump":
         sampler.turn_pump_on()
-        print(pump_action)
-        pump_time, pump_action = next(pump_schedule)
+        try:
+            pump_time, pump_action = next(pump_schedule)
+        except:
+            pass
     elif current_time == pump_time and pump_action == "stop pump":
         sampler.turn_pump_off()
-        print(pump_action)
-        pump_time, pump_action = next(pump_schedule)
+        try:
+            pump_time, pump_action = next(pump_schedule)
+        except:
+            pass
     elif current_time == valve_time and valve_action == "open valve":
         sampler.open_valve_for_bag(bag_number)
-        print(valve_action)
-        bag_number, valve_time, valve_action = next(valves_schedule)
+        try:
+            bag_number, valve_time, valve_action = next(valves_schedule)
+        except:
+            pass
     elif current_time == valve_time and valve_action == "close valve":
         sampler.close_valve_for_bag(bag_number)
-        print(valve_action)
-        bag_number, valve_time, valve_action = next(valves_schedule)
+        try:
+            bag_number, valve_time, valve_action = next(valves_schedule)
+        except:
+            pass

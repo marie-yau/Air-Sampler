@@ -75,11 +75,12 @@ class SamplerSchedule():
 if __name__ == "__main__":
     file_name = "sample.txt"
     file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "schedules", file_name)
-
     sampler = SamplerSchedule(file_path,0,0,0)
     valve_schedule = sampler.get_complete_valve_schedule()
+    print("\nValve Schedule")
     for line in valve_schedule:
         print(line)
     pump_schedule = sampler.get_complete_pump_schedule()
+    print("\nPump Schedule")
     for line in pump_schedule:
         print(line)
