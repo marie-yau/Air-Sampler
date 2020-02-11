@@ -2,16 +2,17 @@
 Package for GPS module.
 """
 import serial
+from time import time
 from geographic_position import *
 
 class GPS():
     def __init__(self):
         self._sentence_identifier = "$GPGGA,"
-        self._ser = serial.Serial("/dev/ttyAMA0")
+        self._serial_port = serial.Serial("/dev/ttyAMA0")
 
     def _read_GPS_information(self):
         while True:
-            data_from_module = (str)(self._ser.readline())
+            data_from_module = (str)(self._serial_port.readline())
             if data_from_module[0:7] == self._sentence_identifier:
                 gpgga_buffer = data_from_module.split(self._sentence_identifier, 1)[1]
                 nmea_buffer = (gpgga_buffer.split(','))

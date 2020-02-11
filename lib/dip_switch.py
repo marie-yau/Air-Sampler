@@ -4,6 +4,7 @@ Read dual inline package (DIP) switches.
 
 import RPi.GPIO as GPIO
 import settings
+import validate
 
 class DIPSwitch():
     """
@@ -39,14 +40,8 @@ class DIPSwitch():
         assert(len(dip_switch_pin_numbers) > 0)
         # check if all items in the list are unique
         assert(len(dip_switch_pin_numbers) == len(set(dip_switch_pin_numbers)))
-        for pin_number in dip_switch_pin_numbers:
-            # check if `pin_number` is integer
-            assert(isinstance(pin_number, int))
-            # TODO: Check if the `pin_number` is physically possible.
-            # The BCM pin numbers changed between different versions of Pi (revision 1 and revision 2 of Pi).
-            # Should we ask user for revision number or make check more general so both rev1 and rev2 numberings can pass
-            # at the same time?
-            # assert((self._mode == "BCM" and pin_number >= 0 and pin_number <= 27) or (self._mode == "BOARD" and pin_number >= 1 and pin_number <= 40))
+        # check if all pin numbers are valid
+        assert(False not in [validate.is_valid_GPIO_pin_number(pin_number, self._mode) for pin_number in dip_switch_pin_numbers])
         self.dip_switch_pin_numbers = dip_switch_pin_numbers
 
     def _read_switch_positions(self):

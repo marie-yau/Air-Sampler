@@ -20,7 +20,6 @@ class Valve():
         GPIO.setup(self.valve_pin_number, GPIO.OUT)
         self.valve_open = False
 
-    # TODO: I am not sure in which position the valve is initially. Should I set the GPIO to 1 or 0 to open the valve?
     def open_valve(self):
         GPIO.output(self.valve_pin_number, 1)
         self.valve_open = True

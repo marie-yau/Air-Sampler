@@ -10,3 +10,9 @@ def set_board_numbering_mode(mode):
         GPIO.setmode(GPIO.BCM)
     elif mode == "BOARD":
         GPIO.setmode(GPIO.BOARD)
+
+def disable_gpio_warnings():
+    GPIO.setwarnings(False)
+
+def reset_gpio_pins():
+    GPIO.cleanup()

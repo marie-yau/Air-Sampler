@@ -3,6 +3,9 @@ from datetime import datetime, timedelta
 
 from sampler_schedule import *
 from sampler import *
+from valve_event import *
+from pump_event import *
+
 # hardware set up
 bags_to_valve_pin_numbers_dict = {1: 17, 2: 22, 3: 10}
 pump_pin_number = 27
@@ -24,32 +27,23 @@ sampler = Sampler(pump_pin_number, bags_to_valve_pin_numbers_dict, mode)
 valves_schedule = iter(schedules_for_sampler.get_complete_valve_schedule())
 pump_schedule = iter(schedules_for_sampler.get_complete_pump_schedule())
 
-bag_number, valve_time, valve_action = next(valves_schedule)
-pump_time, pump_action = next(pump_schedule)
+valve_event = next(valves_schedule)
+pump_event = next(pump_schedule)
+
 
 while True:
     current_time = datetime.now().replace(microsecond=0)
-    if current_time == pump_time and pump_action == "start pump":
-        sampler.turn_pump_on()
+    if current_time == pump_event.get_pump_time():
+        if pump_event.get_pump_action() == "turn pump on": sampler.turn_pump_on()
+        if pump_event.get_pump_action() == "turn pump off": sampler.turn_pump_off()
         try:
-            pump_time, pump_action = next(pump_schedule)
-        except:
+            pump_event = next(pump_schedule)
+        except StopIteration:
             pass
-    elif current_time == pump_time and pump_action == "stop pump":
-        sampler.turn_pump_off()
+    if current_time == valve_event.get_valve_time():
+        if valve_event.get_valve_action() == "open valve": sampler.open_valve_for_bag()
+        if valve_event.get_valve_action() == "close valve": sampler.close_valve_for_bag()
         try:
-            pump_time, pump_action = next(pump_schedule)
-        except:
-            pass
-    elif current_time == valve_time and valve_action == "open valve":
-        sampler.open_valve_for_bag(bag_number)
-        try:
-            bag_number, valve_time, valve_action = next(valves_schedule)
-        except:
-            pass
-    elif current_time == valve_time and valve_action == "close valve":
-        sampler.close_valve_for_bag(bag_number)
-        try:
-            bag_number, valve_time, valve_action = next(valves_schedule)
-        except:
+            valve_event = next(valves_schedule)
+        except StopIteration:
             pass
