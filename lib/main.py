@@ -42,8 +42,8 @@ while True:
         except StopIteration:
             pass
     if current_time == valve_event.get_valve_time():
-        if valve_event.get_valve_action() == "open valve": sampler.open_valve_for_bag()
-        if valve_event.get_valve_action() == "close valve": sampler.close_valve_for_bag()
+        if valve_event.get_valve_action() == "open valve": sampler.open_valve_for_bag(valve_event.get_valve_number())
+        if valve_event.get_valve_action() == "close valve": sampler.close_valve_for_bag(valve_event.get_valve_number())
         try:
             valve_event = next(valves_schedule)
         except StopIteration:
