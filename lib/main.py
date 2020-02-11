@@ -1,5 +1,6 @@
 from multiprocessing import Process
 from datetime import datetime, timedelta
+import time
 
 from sampler_schedule import *
 from sampler import *
@@ -47,3 +48,4 @@ while True:
             valve_event = next(valves_schedule)
         except StopIteration:
             pass
+    time.sleep(0.25)
