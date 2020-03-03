@@ -296,4 +296,19 @@ To start the script:
     
     
     Press Ctrl + A. After that press X and then press Enter key.
-    
+   
+# Set ID number on SD card
+1. Create a hidden file ```.ID.txt``` in the home directory. To verify that you are in the home directory, use command ```pwd```. It should return ```/home/pi```. 
+
+
+        touch .ID.txt
+        
+        
+2. Write the ID number into the file. For example, if the ID number is 90, open the file in the editor (```nano .ID.txt```), write 90 into the file and save it (```Ctrl+X```).
+
+3. Give the file read-only permission. To verify that the permission was changed, use command ```ls -l -a```. The permission under ``.ID.txt``` should be ```-r--r--r--```.
+        
+        
+        chmod 444 .ID.txt
+        
+        
