@@ -5,12 +5,12 @@ Read dual inline package (DIP) switches.
 import RPi.GPIO as GPIO
 import settings
 import validate
+import logger
 
 class DIPSwitch():
     """
     Read dual inline package (DIP) switches.
     """
-
     def __init__(self, dip_switch_pin_numbers, mode):
         """
         :param dip_switch_pin_numbers: List of at least one integer that represent unique valid pin numbers of the Pi

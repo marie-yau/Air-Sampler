@@ -17,10 +17,10 @@ class Sampler():
         for bag in bag_to_valve_pin_numbers_dict.keys():
             self.bag_to_valve_objects_dict[bag] = Valve(bag_to_valve_pin_numbers_dict[bag], self.mode)
 
-    def open_valve_for_bag(self, bag_number):
+    def open_valve(self, bag_number):
         self.bag_to_valve_objects_dict[bag_number].open_valve()
 
-    def close_valve_for_bag(self, bag_number):
+    def close_valve(self, bag_number):
         self.bag_to_valve_objects_dict[bag_number].close_valve()
 
     def turn_pump_on(self):

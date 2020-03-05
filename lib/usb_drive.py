@@ -4,6 +4,7 @@ from os.path import isfile, join
 class USB_drive():
     def __init__(self, path = "/media/pi"):
         self.path = path
+        self.is_inserted = False
         self.is_inserted()
 
     def is_inserted(self):
@@ -11,10 +12,19 @@ class USB_drive():
         assert(len(inserted_USBs) == 0 or len(inserted_USBs) == 1)
         if len(inserted_USBs == 0):
             self.usb_name = None
-            return False
+            self.is_inserted = False
         else:
             self.usb_name = inserted_USBs[0]
+            self.is_inserted = True
+        return self.is_inserted
+
+    def was_reinserted(self):
+        previously_was_inserted = self.is_inserted
+        now_is_inserted = self.is_inserted()
+        if previously_was_inserted == False and now_is_inserted == True:
             return True
+        else:
+            return False
 
     def get_list_of_files(self):
         assert(self.is_inserted())

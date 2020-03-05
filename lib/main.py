@@ -4,35 +4,38 @@ import time
 
 from sampler_schedule import *
 from sampler import *
-from valve_event import *
 from pump_event import *
+from configuration import *
+from usb_drive import *
 
-# hardware set up
-bags_to_valve_pin_numbers_dict = {1: 17, 2: 22, 3: 10}
-pump_pin_number = 27
-mode = "BCM"
-# set how many seconds the pump should start pumping before and after the valve opens
-pump_starts_before = 5
-pump_ends_after = 5
-pump_tolerance_seconds = 10
+def get_current_valve_and_pump_schedules(usb, ID):
+    path_to_schedule_file = usb.get_path_for_schedule_file(ID)
+    path_to_configuration_file = usb.get_path_for_configuration_file()
+    configuration = Configuration(path_to_configuration_file)
+    schedules_for_sampler = SamplerSchedule(path_to_schedule_file, configuration.get_pump_starts_before(), configuration.get_pump_stops_after(), configuration.get_pump_time_off_tolerance())
+    sampler = Sampler(configuration.get_pump_pin_number(), configuration.get_bag_numbers_to_valve_pin_numbers_dict(), configuration.get_numbering_mode())
+    valves_schedule = iter(schedules_for_sampler.get_complete_valve_schedule()
+    pump_schedule = iter(schedules_for_sampler.get_complete_pump_schedule()
+    return valves_schedule, pump_schedule, sampler
 
+# get ID number from the `.ID.txt` file
+path_to_ID_number_file = "/home/pi/.ID.txt"
+with open(path_to_ID_number_file, "r") as file:
+    content = file.read()
+ID_number = int(content)
 
-# create `file_path` for `file_name` file that is stored in `main.py` file directory
-path = os.getcwd()
-file_path = os.path.abspath(os.path.join(path, os.pardir, "schedules", "sample.txt"))
-# create `schedule` object that reads sampler's schedule from a file
-schedules_for_sampler = SamplerSchedule(file_path, pump_starts_before, pump_ends_after, pump_tolerance_seconds)
-# create `sampler` object that operates valves and pump to fill bags
-sampler = Sampler(pump_pin_number, bags_to_valve_pin_numbers_dict, mode)
-
-valves_schedule = iter(schedules_for_sampler.get_complete_valve_schedule())
-pump_schedule = iter(schedules_for_sampler.get_complete_pump_schedule())
+# wait for USB to be inserted
+usb = USB_drive()
+while True:
+    if usb.is_inserted():
+        valves_schedule, pump_schedule, sampler = get_current_valve_and_pump_schedules(usb, ID_number)
 
 valve_event = next(valves_schedule)
 pump_event = next(pump_schedule)
 
-
 while True:
+    if usb.was_reinserted():
+        valves_schedule, pump_schedule, sampler = get_current_valve_and_pump_schedules(usb, ID_number)
     current_time = datetime.now().replace(microsecond=0)
     if current_time == pump_event.get_pump_time():
         if pump_event.get_pump_action() == "turn pump on": sampler.turn_pump_on()
@@ -42,10 +45,11 @@ while True:
         except StopIteration:
             pass
     if current_time == valve_event.get_valve_time():
-        if valve_event.get_valve_action() == "open valve": sampler.open_valve_for_bag(valve_event.get_valve_number())
-        if valve_event.get_valve_action() == "close valve": sampler.close_valve_for_bag(valve_event.get_valve_number())
+        if valve_event.get_valve_action() == "open valve": sampler.open_valve(valve_event.get_valve_number())
+        if valve_event.get_valve_action() == "close valve": sampler.close_valve(valve_event.get_valve_number())
         try:
             valve_event = next(valves_schedule)
         except StopIteration:
             pass
     time.sleep(0.25)
+    # TODO: break out of the loop

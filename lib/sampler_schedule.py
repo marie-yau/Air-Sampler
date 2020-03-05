@@ -4,20 +4,22 @@ import os
 from pump_event import *
 from valve_event import *
 from bag_event import *
+from logger import *
 
 # TODO: Check file input.
 
 class SamplerSchedule():
 
     def __init__(self, file_path, pump_start_before, pump_end_after, pump_tolerance):
-        self.pump_timedelta_before_valve = self.convert_seconds_to_timedelta_object(pump_start_before)
-        self.pump_timedelta_after_valve = self.convert_seconds_to_timedelta_object(pump_end_after)
-        self.pump_off_time_tolerance = self.convert_seconds_to_timedelta_object(pump_tolerance)
+        self.pump_timedelta_before_valve = pump_start_before
+        self.pump_timedelta_after_valve = pump_end_after
+        self.pump_off_time_tolerance = pump_tolerance
         self.file_path = file_path
         self._read_bag_schedule()
         self._create_valve_schedule(self.complete_bag_schedule)
         self._create_pump_schedule(self.complete_bag_schedule)
 
+    @schedule_logger
     def _read_bag_schedule(self):
         self.complete_bag_schedule = []
         with open(self.file_path) as file:
@@ -33,7 +35,7 @@ class SamplerSchedule():
         # sort `self.complete_bag_schedule` by `time_on` in increasing order
         self.complete_bag_schedule.sort(key=lambda event: event.get_bag_time_on())
 
-
+    @schedule_logger
     def _create_valve_schedule(self, bag_schedule):
         valve_schedule = []
         for bag_event in bag_schedule:
@@ -43,6 +45,7 @@ class SamplerSchedule():
         valve_schedule.sort(key=lambda event: event.get_valve_time())
         return valve_schedule
 
+    @schedule_logger
     def _create_pump_schedule(self, bag_schedule):
         pump_schedule = []
         # create a list of time intervals when the pump is on, the intervals are in format [time_pump_on, time_pump_off]
@@ -97,12 +100,6 @@ class SamplerSchedule():
         current_bag_schedule = self.get_current_bag_schedule(current_time)
         current_pump_schedule = self._create_pump_schedule(current_bag_schedule)
         return current_pump_schedule
-
-    @staticmethod
-    def convert_seconds_to_timedelta_object(number_of_seconds):
-
-        delta = timedelta(seconds=number_of_seconds)
-        return delta
 
     @staticmethod
     def convert_line_to_bag_event(line):
