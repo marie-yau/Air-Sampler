@@ -22,6 +22,9 @@ class Sampler():
 
     def close_valve(self, bag_number):
         self.bag_to_valve_objects_dict[bag_number].close_valve()
+        
+    def close_all_valves(self):
+        [valve.close_valve() for valve in self.bag_to_valve_objects_dict.values()]
 
     def turn_pump_on(self):
         self.pump.start_pumping()
@@ -35,3 +38,9 @@ if __name__ == "__main__":
     pump_pin_number = 27
     numbering_mode = "BCM"
     sampler = Sampler(pump_pin_number, bags_to_valve_pin_numbers_dict, numbering_mode)
+    sampler.open_valve(2)
+    sampler.turn_pump_on()
+    sampler.open_valve(1)
+    time.sleep(10)
+    sampler.close_all_valves()
+    sampler.turn_pump_off()
