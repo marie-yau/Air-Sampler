@@ -38,7 +38,7 @@ Mount the real time clock to Raspberry pi.
 
 If you have real time clock DS3231 Model B (the one with 6 pins), you can't mount it directly on GPIO pins because DS3231's pins are not in correct order.
 
-* Vin connects to pin 1
+* Vin/VCC connects to pin 1 (3.3V)
 
 * GND connects to pin 6
 
@@ -46,6 +46,8 @@ If you have real time clock DS3231 Model B (the one with 6 pins), you can't moun
 
 * SCL connects to pin 5
 
+
+![RTC circuit](/setup/img/setup_RTC_schematic.jpg =224x153)
 
 ### Configuring the real-time clock
 
