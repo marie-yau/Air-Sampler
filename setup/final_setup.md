@@ -1,5 +1,8 @@
 # Hardware setup
 
+## Create circuit for the sampler
+![Circuit diagram for the sampler](/setup/img/final_setup_schematic.jpg)
+
 ## Set up Raspberry Pi
 ### Using monitor and keyboard
  1. Install [balenaEtcher](https://www.balena.io/etcher/).
@@ -193,7 +196,7 @@ To start the script:
     >> sudo supervisorctl start sampler
     
 
-# Set ID number on SD card
+## Set ID number on SD card
 1. Create a hidden file ```.ID.txt``` in the home directory. To verify that you are in the home directory, use command ```pwd```. It should return ```/home/pi```. 
 
 
