@@ -2,7 +2,6 @@ import RPi.GPIO as GPIO
 import time
 import settings
 import validate
-from logger import *
 
 class Valve():
     __slots__ = ["valve_pin_number", "valve_open", "mode"]
@@ -21,12 +20,10 @@ class Valve():
         GPIO.setup(self.valve_pin_number, GPIO.OUT)
         self.valve_open = False
 
-    @event_logger
     def open_valve(self):
         GPIO.output(self.valve_pin_number, 1)
         self.valve_open = True
 
-    @event_logger
     def close_valve(self):
         GPIO.output(self.valve_pin_number, 0)
         self.valve_open = False

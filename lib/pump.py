@@ -2,7 +2,6 @@ import RPi.GPIO as GPIO
 import settings
 import validate
 import time
-from logger import *
 
 class Pump():
     __slots__ = ["pump_pin_number", "pump_on", "mode"]
@@ -21,12 +20,10 @@ class Pump():
         GPIO.setup(self.pump_pin_number, GPIO.OUT)
         self.pump_on = False
 
-    @event_logger
     def start_pumping(self):
         GPIO.output(self.pump_pin_number, 1)
         self.pump_on = True
 
-    @event_logger
     def stop_pumping(self):
         GPIO.output(self.pump_pin_number, 0)
         self.pump_on = False

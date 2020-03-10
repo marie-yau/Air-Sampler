@@ -4,7 +4,6 @@ import os
 from pump_event import *
 from valve_event import *
 from bag_event import *
-from logger import *
 
 # TODO: Check file input.
 
@@ -18,8 +17,7 @@ class SamplerSchedule():
         self._read_bag_schedule()
         self._create_valve_schedule(self.complete_bag_schedule)
         self._create_pump_schedule(self.complete_bag_schedule)
-
-    @schedule_logger
+        
     def _read_bag_schedule(self):
         self.complete_bag_schedule = []
         with open(self.file_path) as file:
@@ -35,7 +33,6 @@ class SamplerSchedule():
         # sort `self.complete_bag_schedule` by `time_on` in increasing order
         self.complete_bag_schedule.sort(key=lambda event: event.get_bag_time_on())
 
-    @schedule_logger
     def _create_valve_schedule(self, bag_schedule):
         valve_schedule = []
         for bag_event in bag_schedule:
@@ -45,7 +42,6 @@ class SamplerSchedule():
         valve_schedule.sort(key=lambda event: event.get_valve_time())
         return valve_schedule
 
-    @schedule_logger
     def _create_pump_schedule(self, bag_schedule):
         pump_schedule = []
         # create a list of time intervals when the pump is on, the intervals are in format [time_pump_on, time_pump_off]
