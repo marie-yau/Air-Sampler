@@ -45,7 +45,8 @@ If you have real time clock DS3231 Model B (the one with 6 pins), you can't moun
 * SDA connects to pin 3
 
 * SCL connects to pin 5
-![Circuit diagram for real time clock](/setup/img/setup_RTC_schematic.jpg)
+.. image:: /setup/img/setup_RTC_schematic.jpg
+   :scale: 50 %
 
 ### Configuring the real-time clock
 
