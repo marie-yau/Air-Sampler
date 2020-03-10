@@ -1,7 +1,7 @@
 # Hardware setup
 
 ## Create circuit for the sampler
-![Circuit diagram for the sampler](/img/final_setup_schematic.jpg)
+![Circuit diagram for the sampler](/setup/img/final_setup_schematic.jpg)
 
 ## Set up Raspberry Pi
 ### Using monitor and keyboard
