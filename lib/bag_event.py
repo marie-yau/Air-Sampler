@@ -48,7 +48,7 @@ class BagEvent():
     
     def print_bag_event(self):
         """
-        Print information contained in the `BagEvent` object in the format "bag_event   time_on   time_off"
+        Print information contained in the `BagEvent` object in the format "bag_number   time_on   time_off"
         (e.g. "3   11:30:00 02-12-2020   11:31:30 02:12:2020").
         """
         print(self.bag_number, "\t", self.bag_time_on, "\t", self.bag_time_off)
