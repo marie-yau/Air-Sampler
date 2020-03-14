@@ -1,11 +1,12 @@
 # Configure GPS
 
 ## Circuit
+The GPS module used was E218213 by adafruit.
 * Vin connects to pin 17 (or any other 3.3 V pin)
 * GND connects to pin 39 (or any other ground pin)
 * RX connects to pin 8
 * TX connects to pin 10
-
+![Circuit diagram for the sampler](/setup/img/setup_GPS.jpg)
 ## Configuration
 1. Connect Raspberry Pi to Wi-Fi.
 2. Enable serial interface.
