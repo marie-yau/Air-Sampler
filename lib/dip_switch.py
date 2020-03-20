@@ -5,7 +5,6 @@ Read dual inline package (DIP) switches.
 import RPi.GPIO as GPIO
 import settings
 import validate
-import logger
 
 class DIPSwitch():
     """

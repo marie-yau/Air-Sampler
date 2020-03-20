@@ -1,7 +1,16 @@
+"""
+Store information about a valve event.
+"""
+
 from datetime import datetime
 
 class ValveEvent():
+    """
+    Class for storing information (time, valve number and action) about a valve event.
+    """
+
     __slots__ = ["valve_time", "valve_number", "valve_action"]
+
     def __init__(self, time, number, action):
         self.set_valve_time(time)
         self.set_valve_number(number)

@@ -1,18 +1,36 @@
+"""
+Package for sampler that contains pump and valves.
+"""
+
 import RPi.GPIO as GPIO
 import time
 from pump import *
 from valve import *
 
 class Sampler():
+    """
+    Class for setting sampler that contains a pump valves
+    """
+
     def __init__(self, pump_pin_number, bag_to_valve_pin_numbers_dict, mode):
         self.mode = mode
         self.set_pump(pump_pin_number)
         self.set_valves(bag_to_valve_pin_numbers_dict)
 
     def set_pump(self, pump_pin_number):
+        """
+        Sets up a `Pump` objects.
+        :param pump_pin_number: Integer that represents a GPIO pin number that the pump is connected to
+        """
         self.pump = Pump(pump_pin_number, self.mode)
 
     def set_valves(self, bag_to_valve_pin_numbers_dict):
+        """
+        Set up `Valve` objects.
+        :param bag_to_valve_pin_numbers_dict: Dictionary containing bag numbers (integers) as keys and
+        corresponding GPIO numbers (integers) as values.
+        :return:
+        """
         self.bag_to_valve_objects_dict = {}
         for bag in bag_to_valve_pin_numbers_dict.keys():
             self.bag_to_valve_objects_dict[bag] = Valve(bag_to_valve_pin_numbers_dict[bag], self.mode)

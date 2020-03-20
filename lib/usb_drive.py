@@ -1,3 +1,7 @@
+"""
+Package for a USB drive.
+"""
+
 from os import listdir
 from os.path import isfile, join
 

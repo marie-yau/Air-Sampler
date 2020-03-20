@@ -1,11 +1,13 @@
+"""
+Store information about sampler schedule.
+"""
+
 from datetime import datetime, timedelta
 import os
 
 from pump_event import *
 from valve_event import *
 from bag_event import *
-
-# TODO: Check file input.
 
 class SamplerSchedule():
 
@@ -21,9 +23,9 @@ class SamplerSchedule():
     def _read_bag_schedule(self):
         self.complete_bag_schedule = []
         with open(self.file_path) as file:
-            # TODO: check if the first line is really a header, not a schedule line
-            # skip header line of file
+            # skip header line of file and check its format
             header_line = next(file)
+            assert(header_line == "Bag number, Start filling, Stop filling\n")
             for line in file:
                 # if first character of `line` is `#`, the whole line is considered to be a comment and is skipped
                 if line[0] == "#":

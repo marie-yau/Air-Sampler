@@ -1,3 +1,7 @@
+"""
+Store information (bag number, time bag starts filling, time bag stops filling) about a single bag event.
+"""
+
 from datetime import datetime, timedelta
 
 class BagEvent():
@@ -12,10 +16,16 @@ class BagEvent():
         self.set_bag_time_off(end_time)
     
     def set_bag_number(self, number):
+        # verify that `number` is a positive integer
         assert(isinstance(number, int) and number > 0)
         self.bag_number = number
         
     def set_bag_time_on(self, time_on):
+        """
+        Sets `self.bag_time_on` attribute of the class and verifies that it is a `datetime` object and that
+        `self.bag_time_on` is earlier than `self.bag_time_off`.
+        :param time_on: datetime object
+        """
         assert(isinstance(time_on, datetime))
         self.bag_time_on = time_on
         # check if `self.bag_time_on` is earlier than `self.bag_time_off`
@@ -26,8 +36,14 @@ class BagEvent():
             pass
         
     def set_bag_time_off(self, time_off):
+        """
+        Sets `self.bag_time_off` attribute of the class and verifies that it is a `datetime` object and that
+        `self.bag_time_on` is earlier than `self.bag_time_off`.
+        :param time_off: datetime object
+        """
         assert(isinstance(time_off, datetime))
         self.bag_time_off = time_off
+        # check if `self.bag_time_on` is earlier than `self.bag_time_off`
         try:
             assert(self.bag_time_on < self.bag_time_off)
         # needed in case `self.bag_time_on` hasn't been set yet
@@ -35,24 +51,38 @@ class BagEvent():
             pass
 
     def get_bag_number(self):
+        """
+        :return: Integer that represents a bag number
+        """
         return self.bag_number
     
     def get_bag_time_on(self):
+        """
+        :return: `datetime` object that represents the time when the bag starts filling
+        """
         return self.bag_time_on
     
     def get_bag_time_off(self):
+        """
+        :return: `datetime` object that represents the time when the bag stops filling
+        """
         return self.bag_time_off
     
     def get_bag_event(self):
+        """
+        :return: tuple containing an integer that represents a bag number, `datetime` object that represents the time
+        when the bag starts filling and `datetime` object that represents the time when the bag stops filling
+        """
         return self.bag_number, self.bag_time_on, self.bag_time_off
     
     def print_bag_event(self):
         """
         Print information contained in the `BagEvent` object in the format "bag_number   time_on   time_off"
-        (e.g. "3   11:30:00 02-12-2020   11:31:30 02:12:2020").
+        (e.g. "3   11:30:00 02-12-2020   11:31:30 02-12-2020").
         """
         print(self.bag_number, "\t", self.bag_time_on, "\t", self.bag_time_off)
-        
+
+
 if __name__ == "__main__":
     bag_number = 5
     start_time = datetime.now().replace(microsecond=0)

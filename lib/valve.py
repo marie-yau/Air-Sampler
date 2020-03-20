@@ -1,10 +1,18 @@
+"""
+Package for a valve.
+"""
+
 import RPi.GPIO as GPIO
 import time
 import settings
 import validate
 
 class Valve():
+    """
+    Class for storing information about a valve event.
+    """
     __slots__ = ["valve_pin_number", "valve_open", "mode"]
+
     def __init__(self, valve_pin_number, mode):
         # set board numbering mode
         settings.set_board_numbering_mode(mode)
