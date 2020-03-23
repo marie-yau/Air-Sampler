@@ -7,6 +7,9 @@
 ### What do log files log?
 
 
+
+
+
 ## USB
 
 ### How long does the USB needs to be inserted in Pi?
@@ -23,6 +26,10 @@
 
 ### Can the schedule and configuration files be stored in a folder on the USB drive?
 
+
+
+
+
 ## Raspberry Pi 
 
 ### If I turn the Pi off and back on again, will it remember its schedule and continue executing it?
@@ -35,6 +42,12 @@
 ### When will Pi turn itself off?
 
 
+
+
+
+
+
+
 ## Schedule and configuration files
 
 ### What happens when files are not in the correct format?
@@ -44,6 +57,10 @@
 ### Can I change the schedule after the current schedule finished executing?
 
 ### What happens when I insert a USB with an old schedule to the Pi?
+
+### I insert/reinsert a USB with a schedule to the Pi late. Some samples were already supposed to be taken and some samples are supposed to be taken right now. What is going to happen?
+
+
 
 
 ## Hardware
