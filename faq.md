@@ -65,9 +65,11 @@
 
 ## Hardware
 
-### What does it mean when diode lights up?
+### What does it mean when the diode lights up?
 
-### The diode didn't light up. What's wrong?
+### I inserted the USB to the Pi and the diode lighted up. After some time, I came back to check up on the sampler, the diode was no longer on. Does it mean there was a problem?
+
+### The diode didn't light up after I inserted the USB to the Pi. What's wrong?
 There are several possibilities:
 - The schedule and configuration files 
         - aren't in the required format.
