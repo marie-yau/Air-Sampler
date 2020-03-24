@@ -6,6 +6,7 @@ import RPi.GPIO as GPIO
 import settings
 import validate
 import time
+import logging
 
 class Diode():
     """
@@ -13,11 +14,13 @@ class Diode():
     """
     __slots__ = ["diode_pin_number", "diode_on", "mode"]
 
-    def __init__(self, diode_pin_number, mode):
+    def __init__(self, diode_pin_number, mode, logger):
         settings.set_board_numbering_mode(mode)
         self.mode = mode
         self.set_diode_pin_number(diode_pin_number)
         self.__diode_setup()
+        # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
+        self.logger = logger
 
     def set_diode_pin_number(self, diode_pin_number):
         """
@@ -25,6 +28,7 @@ class Diode():
         """
         assert(validate.is_valid_GPIO_pin_number(diode_pin_number, self.mode))
         self.diode_pin_number = diode_pin_number
+        self.logger.info("diode: pump GPIO number set to {} {}".format(self.diode_pin_number, self.mode))
 
     def __pump_setup(self):
         """
@@ -36,10 +40,18 @@ class Diode():
     def turn_diode_on(self):
         GPIO.output(self.diode_pin_number, 1)
         self.diode_on = True
+        self.logger.info("diode: diode turned on")
+
+    def turn_diode_on_for(self, number_of_seconds):
+        assert(isinstance(number_of_seconds, int))
+        self.turn_diode_on()
+        time.sleep(number_of_seconds)
+        self.turn_diode_off()
 
     def turn_diode_off(self):
         GPIO.output(self.diode_pin_number, 0)
         self.diode_on = False
+        self.logger.info("diode: diode turned off")
 
     def is_on(self):
         """

@@ -4,25 +4,29 @@ Package for sampler that contains pump and valves.
 
 import RPi.GPIO as GPIO
 import time
+import logging
+
 from pump import *
 from valve import *
 
 class Sampler():
     """
-    Class for setting sampler that contains a pump valves
+    Class for setting sampler that contains a pump and valves
     """
 
-    def __init__(self, pump_pin_number, bag_to_valve_pin_numbers_dict, mode):
+    def __init__(self, pump_pin_number, bag_to_valve_pin_numbers_dict, mode, logger):
         self.mode = mode
         self.set_pump(pump_pin_number)
         self.set_valves(bag_to_valve_pin_numbers_dict)
+        # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
+        self.logger = logger
 
     def set_pump(self, pump_pin_number):
         """
         Sets up a `Pump` objects.
         :param pump_pin_number: Integer that represents a GPIO pin number that the pump is connected to
         """
-        self.pump = Pump(pump_pin_number, self.mode)
+        self.pump = Pump(pump_pin_number, self.mode, self.logger)
 
     def set_valves(self, bag_to_valve_pin_numbers_dict):
         """
@@ -33,7 +37,7 @@ class Sampler():
         """
         self.bag_to_valve_objects_dict = {}
         for bag in bag_to_valve_pin_numbers_dict.keys():
-            self.bag_to_valve_objects_dict[bag] = Valve(bag_to_valve_pin_numbers_dict[bag], self.mode)
+            self.bag_to_valve_objects_dict[bag] = Valve(bag_to_valve_pin_numbers_dict[bag], self.mode, self.logger)
 
     def open_valve(self, bag_number):
         self.bag_to_valve_objects_dict[bag_number].open_valve()

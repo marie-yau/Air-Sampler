@@ -4,6 +4,8 @@ Read configuration from a file.
 
 from datetime import timedelta
 import os
+import logging
+
 import validate
 
 class Configuration():
@@ -31,11 +33,13 @@ class Configuration():
     __slots__ = ["bag_numbers_to_valve_pin_numbers_dict", "pump_pin_number", "diode_pin_number", "numbering_mode",
                  "pump_starts_before", "pump_stops_after", "pump_time_off_tolerance"]
 
-    def __init__(self, file_path):
+    def __init__(self, file_path, logger):
         """
         :param file_path: string representing a path to the configuration file
         """
         self._read_configuration_file(file_path)
+        # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
+        self.logger = logger
 
     def _read_configuration_file(self, file_path):
         """
@@ -71,6 +75,7 @@ class Configuration():
         """
         assert(mode == "BCM" or mode == "BOARD")
         self.numbering_mode = mode
+        self.logger.info("configuration: set numbering mode to {}".format(self.numbering_mode))
 
     def set_bag_numbers_to_valve_pin_numbers_dict(self, line):
         """
@@ -87,6 +92,7 @@ class Configuration():
             bag_number = int(bag.strip())
             valve_number = int(valve.strip())
             self.bag_numbers_to_valve_pin_numbers_dict[bag_number] = valve_number
+        self.logger.info("configuration: set bag numbers to GPIO number dictionary to {}".format(self.bag_numbers_to_valve_pin_numbers_dict))
 
     def set_pump_pin_number(self, pin):
         """
@@ -95,6 +101,7 @@ class Configuration():
         pin_number = int(pin)
         assert(validate.is_valid_GPIO_pin_number(pin_number, self.numbering_mode))
         self.pump_pin_number = pin_number
+        self.logger.info("configuration: set pump GPIO number to {}".format(self.pump_pin_number))
 
     def set_diode_pin_number(self, pin):
         """
@@ -103,6 +110,7 @@ class Configuration():
         pin_number = int(pin)
         assert(validate.is_valid_GPIO_pin_number(pin_number, self.numbering_mode))
         self.diode_pin_number = pin_number
+        self.logger.info("configuration: set diode GPIO pin number to {}".format(self.diode_pin_number))
 
     def set_pump_starts_before(self, number_of_seconds):
         """
@@ -110,6 +118,7 @@ class Configuration():
         valve opens
         """
         self.pump_starts_before = timedelta(seconds=int(number_of_seconds))
+        self.logger.info("configuration: set pump starts before valve opens to {}".format(self.pump_starts_before))
 
     def set_pump_stops_after(self, number_of_seconds):
         """
@@ -117,6 +126,7 @@ class Configuration():
         valve closes
         """
         self.pump_stops_after = timedelta(seconds=int(number_of_seconds))
+        self.logger.info("configuration: set pump stops after valve closes to {}".format(self.pump_stops_after))
 
     def set_pump_time_off_tolerance(self, number_of_seconds):
         """
@@ -124,6 +134,7 @@ class Configuration():
         than specified number of seconds, it will continue pumping.
         """
         self.pump_time_off_tolerance = timedelta(seconds=int(number_of_seconds))
+        self.logger.info("configuration: set pump time off tolerance to {}".format(self.pump_time_off_tolerance))
 
     def get_numbering_mode(self):
         """

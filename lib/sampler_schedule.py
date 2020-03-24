@@ -11,7 +11,7 @@ from bag_event import *
 
 class SamplerSchedule():
 
-    def __init__(self, file_path, pump_start_before, pump_end_after, pump_tolerance):
+    def __init__(self, file_path, pump_start_before, pump_end_after, pump_tolerance, logger):
         self.pump_timedelta_before_valve = pump_start_before
         self.pump_timedelta_after_valve = pump_end_after
         self.pump_off_time_tolerance = pump_tolerance
@@ -19,6 +19,8 @@ class SamplerSchedule():
         self._read_bag_schedule()
         self._create_valve_schedule(self.complete_bag_schedule)
         self._create_pump_schedule(self.complete_bag_schedule)
+        # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
+        self.logger = logger
         
     def _read_bag_schedule(self):
         self.complete_bag_schedule = []
@@ -81,22 +83,26 @@ class SamplerSchedule():
         return complete_pump_schedule
 
     def get_current_bag_schedule(self, current_time):
+        self._read_bag_schedule()
         current_bag_schedule = []
         for bag_number, time_on, time_off in self.complete_bag_schedule:
             if time_on - self.pump_timedelta_before_valve > current_time:
                 current_bag_schedule.append([bag_number, time_on, time_off])
+        self.logger.info("Generated current bag schedule:\n{}".format(current_bag_schedule))
         return current_bag_schedule
 
     def get_current_valve_schedule(self, current_time):
         self._read_bag_schedule()
         current_bag_schedule = self.get_current_bag_schedule(current_time)
         current_valve_schedule = self._create_valve_schedule(current_bag_schedule)
+        self.logger.info("Generated current valve schedule:\n{}".format(current_valve_schedule))
         return current_valve_schedule
 
     def get_current_pump_schedule(self, current_time):
         self._read_bag_schedule()
         current_bag_schedule = self.get_current_bag_schedule(current_time)
         current_pump_schedule = self._create_pump_schedule(current_bag_schedule)
+        self.logger.info("Generated current pump schedule:\n{}".format(current_pump_schedule))
         return current_pump_schedule
 
     @staticmethod
