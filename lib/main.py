@@ -74,8 +74,8 @@ while True:
     time.sleep(1)
 
 # turn diode on to indicate schedule and configuration file were read correctly
-diode_light = threading.Thread(target=diode.turn_diode_on, args=5)
-diode_light.start()
+diode_light_thread = threading.Thread(target=diode.turn_diode_on, args=(5,))
+diode_light_thread.start()
 
 # this while loop never stops to allow user to reinsert usb with a new schedule even after the current schedule finished
 while True:
