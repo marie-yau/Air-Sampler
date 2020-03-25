@@ -31,7 +31,8 @@ class Configuration():
     -----------------
     """
     __slots__ = ["bag_numbers_to_valve_pin_numbers_dict", "pump_pin_number", "diode_pin_number", "numbering_mode",
-                 "pump_starts_before", "pump_stops_after", "pump_time_off_tolerance", "logger"]
+                 "pump_starts_before", "pump_stops_after", "pump_time_off_tolerance", "logger",
+                 "diode_time_on"]
 
     def __init__(self, file_path, logger):
         """
@@ -167,7 +168,7 @@ class Configuration():
         return self.diode_pin_number
 
     def get_diode_time_on(self):
-        return self.get_diode_time_on()
+        return self.diode_time_on
 
     def get_pump_starts_before(self):
         """
@@ -189,13 +190,15 @@ class Configuration():
         return self.pump_time_off_tolerance
 
 if __name__ == "__main__":
-    path = os.getcwd()
-    file_path = os.path.abspath(os.path.join(path, os.pardir, "config_files", "90.txt"))
-    configuration = Configuration(file_path)
+    file_path = "/media/pi/90AF-B6A7/90_config.txt"
+    logger = logging.getLogger()
+    configuration = Configuration(file_path, logger)
+    
     print("Numbering mode:", configuration.get_numbering_mode())
     print("Bag numbers to valve pin numbers:", configuration.get_bag_numbers_to_valve_pin_numbers_dict())
     print("Pump pin number:", configuration.get_pump_pin_number())
     print("Diode pin number:", configuration.get_diode_pin_number())
+    print("Diode time on:", configuration.get_diode_time_on())
     print("Pump starts before:", configuration.get_pump_starts_before())
     print("Pump stops after:", configuration.get_pump_stops_after())
     print("Pump time off tolerance:", configuration.get_pump_time_off_tolerance())

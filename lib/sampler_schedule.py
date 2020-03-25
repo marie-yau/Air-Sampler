@@ -71,6 +71,8 @@ class SamplerSchedule():
         return valve_schedule
 
     def _create_pump_schedule(self, bag_schedule):
+        if not bag_schedule:
+            self.logger.error("Sampler schedule: list of bag events is empty, can't create pump schedule")
         pump_schedule = []
         # create a list of time intervals when the pump is on, the intervals are in format [time_pump_on, time_pump_off]
         unmerged_pump_on_intervals = [[bag_event.get_bag_time_on() - self.pump_timedelta_before_valve, bag_event.get_bag_time_off()

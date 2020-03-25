@@ -50,6 +50,9 @@ def update_schedules_and_configuration(usb, ID, logger):
     pump_schedule = iter(schedules_for_sampler.get_current_pump_schedule(current_time))
     return valves_schedule, pump_schedule, sampler, diode
 
+disable_gpio_warnings()
+reset_gpio_pins()
+
 # create logger object for logging events and errors
 current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 logging.basicConfig(filename=current_time + ".log",
@@ -84,7 +87,7 @@ while True:
     time.sleep(1)
 
 # turn diode on to indicate schedule and configuration file were read correctly
-diode_light_thread = threading.Thread(target=diode.turn_diode_on, args=(diode.get_diode_time_on_in_seconds(),))
+diode_light_thread = threading.Thread(target=diode.turn_diode_on_for, args=(diode.get_diode_time_on_in_seconds(),))
 diode_light_thread.start()
 
 pump_schedule_finished = False
@@ -131,6 +134,8 @@ while True:
         
     if valve_schedule_finished and pump_schedule_finished:
         reset_gpio_pins()
+        logger.info("Main: program succesfully")
         sys.exit()
     # run the while loop once a second
     time.sleep(1)
+    

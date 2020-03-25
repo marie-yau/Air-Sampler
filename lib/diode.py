@@ -51,7 +51,7 @@ class Diode():
         self.logger.info("diode: diode turned on")
 
     def turn_diode_on_for(self, number_of_seconds):
-        assert(isinstance(number_of_seconds, int))
+        assert(isinstance(number_of_seconds, float))
         self.turn_diode_on()
         time.sleep(number_of_seconds)
         self.turn_diode_off()
