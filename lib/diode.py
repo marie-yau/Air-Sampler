@@ -7,12 +7,13 @@ import settings
 import validate
 import time
 import logging
+from datetime import timedelta
 
 class Diode():
     """
     Class for setting a diode.
     """
-    __slots__ = ["diode_pin_number", "diode_on", "mode", "logger"]
+    __slots__ = ["diode_pin_number", "diode_on", "mode", "logger", "time_on_seconds"]
 
     def __init__(self, diode_pin_number, mode, logger):
         # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
@@ -36,6 +37,13 @@ class Diode():
         """
         GPIO.setup(self.diode_pin_number, GPIO.OUT)
         self.diode_on = False
+
+    def set_diode_time_on(self, time_on):
+        assert(isinstance(time_on, timedelta))
+        self.time_on_seconds = time_on.total_seconds()
+
+    def get_diode_time_on_in_seconds(self):
+        return self.time_on_seconds
 
     def turn_diode_on(self):
         GPIO.output(self.diode_pin_number, 1)

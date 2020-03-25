@@ -59,6 +59,8 @@ class Configuration():
                 self.set_pump_pin_number(next(lines_iterator))
             elif line == "Diode pin number":
                 self.set_diode_pin_number(next(lines_iterator))
+            elif line == "Diode time on":
+                self.set_diode_time_on(next(lines_iterator))
             elif line == "Number of seconds pump starts pumping before valve opens":
                 self.set_pump_starts_before(next(lines_iterator))
             elif line == "Number of seconds pump continues pumping after valve closes":
@@ -112,6 +114,10 @@ class Configuration():
         self.diode_pin_number = pin_number
         self.logger.info("configuration: set diode GPIO pin number to {}".format(self.diode_pin_number))
 
+    def set_diode_time_on(self, time):
+        self.diode_time_on = timedelta(seconds=int(time))
+        self.logger.info("Configuration: set diode time on to {}".format(self.diode_time_on))
+
     def set_pump_starts_before(self, number_of_seconds):
         """
         :param number_of_seconds: String representing the number of seconds that the pump starts pumping before the
@@ -159,6 +165,9 @@ class Configuration():
         :return: Integer that represents the GPIO pin number that the diode is connected to
         """
         return self.diode_pin_number
+
+    def get_diode_time_on(self):
+        return self.get_diode_time_on()
 
     def get_pump_starts_before(self):
         """

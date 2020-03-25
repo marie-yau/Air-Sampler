@@ -39,6 +39,8 @@ def update_schedules_and_configuration(usb, ID, logger):
     diode = Diode(configuration.get_diode_pin_number(),
                   configuration.get_numbering_mode(),
                   logger)
+    diode.set_diode_time_on(configuration.get_diode_time_on())
+
     current_time = datetime.now()
     # create iterator over lists of `valve_event` objects and `pump_event` objects
     # note that lists include only future events, not past events
@@ -75,7 +77,7 @@ while True:
     time.sleep(1)
 
 # turn diode on to indicate schedule and configuration file were read correctly
-diode_light_thread = threading.Thread(target=diode.turn_diode_on, args=(5,))
+diode_light_thread = threading.Thread(target=diode.turn_diode_on, args=(diode.get_diode_time_on_in_seconds(),))
 diode_light_thread.start()
 
 # this while loop never stops to allow user to reinsert usb with a new schedule even after the current schedule finished
@@ -88,6 +90,8 @@ while True:
         valves_schedule, pump_schedule, sampler = update_schedules_and_configuration(usb, ID_number, logger)
         valve_event = next(valves_schedule)
         pump_event = next(pump_schedule)
+        diode_light_thread = threading.Thread(target=diode.turn_diode_on, args=(diode.get_diode_time_on_in_seconds(),))
+        diode_light_thread.start()
     # get current time without microseconds
     current_time = datetime.now().replace(microsecond=0)
     if current_time == pump_event.get_pump_time():
