@@ -39,14 +39,15 @@ def update_schedules_and_configuration(usb, ID, logger):
     diode = Diode(configuration.get_diode_pin_number(),
                   configuration.get_numbering_mode(),
                   logger)
+    current_time = datetime.now()
     # create iterator over lists of `valve_event` objects and `pump_event` objects
     # note that lists include only future events, not past events
-    valves_schedule = iter(schedules_for_sampler.get_current_valve_schedule())
-    pump_schedule = iter(schedules_for_sampler.get_current_pump_schedule())
+    valves_schedule = iter(schedules_for_sampler.get_current_valve_schedule(current_time))
+    pump_schedule = iter(schedules_for_sampler.get_current_pump_schedule(current_time))
     return valves_schedule, pump_schedule, sampler, diode
 
 # create logger object for logging events and errors
-current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 logging.basicConfig(filename=current_time + ".log",
                     format="%(asctime)s %(message)s",
                     filemode="w",

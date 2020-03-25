@@ -15,11 +15,11 @@ class Sampler():
     """
 
     def __init__(self, pump_pin_number, bag_to_valve_pin_numbers_dict, mode, logger):
+        # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
+        self.logger = logger
         self.mode = mode
         self.set_pump(pump_pin_number)
         self.set_valves(bag_to_valve_pin_numbers_dict)
-        # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
-        self.logger = logger
 
     def set_pump(self, pump_pin_number):
         """

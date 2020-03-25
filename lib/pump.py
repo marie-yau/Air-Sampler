@@ -12,16 +12,16 @@ class Pump():
     """
     Class for setting a pump.
     """
-    __slots__ = ["pump_pin_number", "pump_on", "mode"]
+    __slots__ = ["pump_pin_number", "pump_on", "mode", "logger"]
 
     def __init__(self, pump_pin_number, mode, logger):
+        # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
+        self.logger = logger
         # set board numbering mode for the Pi (either "BCM" or "BOARD")
         settings.set_board_numbering_mode(mode)
         self.mode = mode
         self.set_pump_pin_number(pump_pin_number)
         self.__pump_setup()
-        # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
-        self.logger = logger
 
     def set_pump_pin_number(self, pump_pin_number):
         """

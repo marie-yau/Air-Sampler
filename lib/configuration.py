@@ -31,15 +31,15 @@ class Configuration():
     -----------------
     """
     __slots__ = ["bag_numbers_to_valve_pin_numbers_dict", "pump_pin_number", "diode_pin_number", "numbering_mode",
-                 "pump_starts_before", "pump_stops_after", "pump_time_off_tolerance"]
+                 "pump_starts_before", "pump_stops_after", "pump_time_off_tolerance", "logger"]
 
     def __init__(self, file_path, logger):
         """
         :param file_path: string representing a path to the configuration file
         """
-        self._read_configuration_file(file_path)
         # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
         self.logger = logger
+        self._read_configuration_file(file_path)
 
     def _read_configuration_file(self, file_path):
         """

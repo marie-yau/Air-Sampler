@@ -12,15 +12,15 @@ class Diode():
     """
     Class for setting a diode.
     """
-    __slots__ = ["diode_pin_number", "diode_on", "mode"]
+    __slots__ = ["diode_pin_number", "diode_on", "mode", "logger"]
 
     def __init__(self, diode_pin_number, mode, logger):
+        # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
+        self.logger = logger
         settings.set_board_numbering_mode(mode)
         self.mode = mode
         self.set_diode_pin_number(diode_pin_number)
         self.__diode_setup()
-        # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
-        self.logger = logger
 
     def set_diode_pin_number(self, diode_pin_number):
         """
@@ -30,7 +30,7 @@ class Diode():
         self.diode_pin_number = diode_pin_number
         self.logger.info("diode: pump GPIO number set to {} {}".format(self.diode_pin_number, self.mode))
 
-    def __pump_setup(self):
+    def __diode_setup(self):
         """
         Sets the specified GPIO pin as an output pin.
         """

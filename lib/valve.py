@@ -11,16 +11,16 @@ class Valve():
     """
     Class for storing information about a valve event.
     """
-    __slots__ = ["valve_pin_number", "valve_open", "mode"]
+    __slots__ = ["valve_pin_number", "valve_open", "mode", "logger"]
 
     def __init__(self, valve_pin_number, mode, logger):
+        # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
+        self.logger = logger
         # set board numbering mode
         settings.set_board_numbering_mode(mode)
         self.mode = mode
         self.set_valve_pin_number(valve_pin_number)
         self.__valve_setup()
-        # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
-        self.logger = logger
 
     def set_valve_pin_number(self, valve_pin_number):
         assert(validate.is_valid_GPIO_pin_number(valve_pin_number, self.mode))
