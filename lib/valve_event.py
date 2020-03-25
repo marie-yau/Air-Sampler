@@ -38,10 +38,10 @@ class ValveEvent():
         return self.valve_action
 
     def get_valve_event(self):
-        return (self.valve_time, self.valve_number, self.valve_action)
+        return (self.valve_number, self.valve_time, self.valve_action)
 
     def print_valve_event(self):
-        print(self.valve_time, "\t", self.valve_number, "\t", self.valve_action)
+        print(self.valve_number, "\t", self.valve_time, "\t", self.valve_action)
 
 if __name__ == "__main__":
     current_time = datetime.now().replace(microsecond=0)

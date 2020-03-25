@@ -4,6 +4,7 @@ Store information about sampler schedule.
 
 from datetime import datetime, timedelta
 import os
+import logging
 
 from pump_event import *
 from valve_event import *
@@ -12,15 +13,30 @@ from bag_event import *
 class SamplerSchedule():
 
     def __init__(self, file_path, pump_start_before, pump_end_after, pump_tolerance, logger):
-        self.pump_timedelta_before_valve = pump_start_before
-        self.pump_timedelta_after_valve = pump_end_after
-        self.pump_off_time_tolerance = pump_tolerance
+        # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
+        self.logger = logger
+        self.set_pump_timedelta_before_valve(pump_start_before)
+        self.set_pump_timedelta_after_valve(pump_end_after)
+        self.set_pump_off_time_tolerance(pump_tolerance)
         self.file_path = file_path
         self._read_bag_schedule()
         self._create_valve_schedule(self.complete_bag_schedule)
         self._create_pump_schedule(self.complete_bag_schedule)
-        # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
-        self.logger = logger
+
+    def set_pump_timedelta_before_valve(self, pump_start_before):
+        assert(isinstance(pump_start_before, timedelta))
+        self.pump_timedelta_before_valve = pump_start_before
+        self.logger.info("Sampler schedule: set pump to start {} before valve opens".format(self.pump_timedelta_before_valve))
+
+    def set_pump_timedelta_after_valve(self, pump_end_after):
+        assert (isinstance(pump_end_after, timedelta))
+        self.pump_timedelta_after_valve = pump_end_after
+        self.logger.info("Sampler schedule: set pump to stop {} after valve closes".format(self.pump_timedelta_after_valve))
+
+    def set_pump_off_time_tolerance(self, pump_tolerance):
+        assert (isinstance(pump_tolerance, timedelta))
+        self.pump_off_time_tolerance = pump_tolerance
+        self.logger.info("Sampler schedule: set pump time off tolerance to {}".format(self.pump_off_time_tolerance))
         
     def _read_bag_schedule(self):
         self.complete_bag_schedule = []
@@ -36,6 +52,14 @@ class SamplerSchedule():
                 self.complete_bag_schedule.append(bag_event)
         # sort `self.complete_bag_schedule` by `time_on` in increasing order
         self.complete_bag_schedule.sort(key=lambda event: event.get_bag_time_on())
+        self.logger.info("Sampler schedule: read bag schedule from file {}: {}".format(self.file_path,
+                                                                                       [[bag_event.get_bag_number(),
+                                                                                bag_event.get_bag_time_on().strftime(
+                                                                                    "%Y-%m-%d %H:%M:%S"),
+                                                                                bag_event.get_bag_time_off().strftime(
+                                                                                    "%Y-%m-%d %H:%M:%S")]
+                                                                               for bag_event in
+                                                                               self.complete_bag_schedule]))
 
     def _create_valve_schedule(self, bag_schedule):
         valve_schedule = []
@@ -49,8 +73,8 @@ class SamplerSchedule():
     def _create_pump_schedule(self, bag_schedule):
         pump_schedule = []
         # create a list of time intervals when the pump is on, the intervals are in format [time_pump_on, time_pump_off]
-        unmerged_pump_on_intervals = [[bag_event.get_bag_time_on() - self.pump_timedelta_before_valve, bag_event.get_bag_time_off() + self.pump_timedelta_after_valve]
-                                      for bag_event in bag_schedule]
+        unmerged_pump_on_intervals = [[bag_event.get_bag_time_on() - self.pump_timedelta_before_valve, bag_event.get_bag_time_off()
+                                       + self.pump_timedelta_after_valve] for bag_event in bag_schedule]
         # sort the list of time intervals by the time pump turns on
         unmerged_pump_on_intervals.sort(key=lambda interval: interval[0])
 
@@ -70,40 +94,62 @@ class SamplerSchedule():
         return pump_schedule
 
     def get_complete_bag_schedule(self):
+        self.logger.info("Sampler schedule: generated complete bag schedule: {}".format([[bag_event.get_bag_number(),
+                                                                               bag_event.get_bag_time_on().strftime(
+                                                                                   "%Y-%m-%d %H:%M:%S"),
+                                                                               bag_event.get_bag_time_off().strftime(
+                                                                                   "%Y-%m-%d %H:%M:%S")]
+                                                                              for bag_event in self.complete_bag_schedule]))
         return self.complete_bag_schedule
 
     def get_complete_valve_schedule(self):
         self._read_bag_schedule()
         complete_valve_schedule = self._create_valve_schedule(self.complete_bag_schedule)
+        self.logger.info("Sampler schedule: generated complete valve schedule: {}".format([[valve_event.get_valve_number(),
+                                                                                            valve_event.get_valve_time().strftime("%Y-%m-%d %H:%M:%S"),
+                                                                                            valve_event.get_valve_action()]
+                                                                                           for valve_event in complete_valve_schedule]))
         return complete_valve_schedule
 
     def get_complete_pump_schedule(self):
         self._read_bag_schedule()
         complete_pump_schedule = self._create_pump_schedule(self.complete_bag_schedule)
+        self.logger.info("Sampler schedule: generated complete pump schedule:{}".format([[pump_event.get_pump_time().strftime("%Y-%m-%d %H:%M:%S"),
+                                                            pump_event.get_pump_action()]
+                                                           for pump_event in complete_pump_schedule]))
         return complete_pump_schedule
 
     def get_current_bag_schedule(self, current_time):
         self._read_bag_schedule()
         current_bag_schedule = []
-        self.logger.info("Sampler schedule: generating current bag schedule:")
         for bag_event in self.complete_bag_schedule:
             if bag_event.get_bag_time_on() - self.pump_timedelta_before_valve > current_time:
                 current_bag_schedule.append(bag_event)
-                #self.logger.info("Sampler schedule: {}, {}, {}".format(bag_event.get_bag_event())
+        self.logger.info("Sampler schedule: generated current bag schedule: {}".format([[bag_event.get_bag_number(),
+                                                       bag_event.get_bag_time_on().strftime("%Y-%m-%d %H:%M:%S"),
+                                                       bag_event.get_bag_time_off().strftime("%Y-%m-%d %H:%M:%S")]
+                                                       for bag_event in current_bag_schedule]))
         return current_bag_schedule
 
     def get_current_valve_schedule(self, current_time):
         self._read_bag_schedule()
         current_bag_schedule = self.get_current_bag_schedule(current_time)
         current_valve_schedule = self._create_valve_schedule(current_bag_schedule)
-        self.logger.info("Generated current valve schedule:\n{}".format(current_valve_schedule))
+        self.logger.info("Sampler schedule: generated current valve schedule: {}".format([[valve_event.get_valve_number(),
+                                                                               valve_event.get_valve_time().strftime(
+                                                                                   "%Y-%m-%d %H:%M:%S"),
+                                                                               valve_event.get_valve_action()]
+                                                                              for valve_event in
+                                                                              current_valve_schedule]))
         return current_valve_schedule
 
     def get_current_pump_schedule(self, current_time):
         self._read_bag_schedule()
         current_bag_schedule = self.get_current_bag_schedule(current_time)
         current_pump_schedule = self._create_pump_schedule(current_bag_schedule)
-        self.logger.info("Generated current pump schedule:\n{}".format(current_pump_schedule))
+        self.logger.info("Sampler schedule: generated current pump schedule: {}".format([[pump_event.get_pump_time().strftime("%Y-%m-%d %H:%M:%S"),
+                                                             pump_event.get_pump_action()]
+                                                            for pump_event in current_pump_schedule]))
         return current_pump_schedule
 
     @staticmethod
@@ -123,18 +169,38 @@ class SamplerSchedule():
         return BagEvent(bag_number, time_on, time_off)
 
 if __name__ == "__main__":
-    file_name = "sample.txt"
-    file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "schedules", file_name)
-    sampler = SamplerSchedule(file_path,5,5,10)
+    # create logger
+    logging.basicConfig(filename="sampler_schedule.txt",
+                        format="%(asctime)s %(message)s",
+                        filemode="w",
+                        level=logging.DEBUG)
+    logger = logging.getLogger()
+
+    file_path = "sample.txt"
+    sampler = SamplerSchedule(file_path, timedelta(seconds=5), timedelta(seconds=5), timedelta(seconds=10), logger)
+
     bag_schedule = sampler.get_complete_bag_schedule()
-    print("\nBag Schedule")
-    for event in bag_schedule:
-        event.print_bag_event()
+    print("\nComplete Bag Schedule")
+    [event.print_bag_event() for event in bag_schedule]
+
     valve_schedule = sampler.get_complete_valve_schedule()
-    print("\nValve Schedule")
-    for event in valve_schedule:
-        event.print_valve_event()
+    print("\nComplete Valve Schedule")
+    [event.print_valve_event() for event in valve_schedule]
+
     pump_schedule = sampler.get_complete_pump_schedule()
-    print("\nPump Schedule")
-    for event in pump_schedule:
-        event.print_pump_event()
+    print("\nComplete Pump Schedule")
+    [event.print_pump_event() for event in pump_schedule]
+
+    current_time = datetime(2020, 3, 6, 11, 38, 30)
+
+    bag_schedule = sampler.get_current_bag_schedule(current_time)
+    print("\nCurrent Bag Schedule")
+    [event.print_bag_event() for event in bag_schedule]
+
+    valve_schedule = sampler.get_current_valve_schedule(current_time)
+    print("\nCurrent Valve Schedule")
+    [event.print_valve_event() for event in valve_schedule]
+
+    pump_schedule = sampler.get_current_pump_schedule(current_time)
+    print("\nCurrent Pump Schedule")
+    [event.print_pump_event() for event in pump_schedule]
