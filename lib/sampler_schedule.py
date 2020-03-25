@@ -85,11 +85,11 @@ class SamplerSchedule():
     def get_current_bag_schedule(self, current_time):
         self._read_bag_schedule()
         current_bag_schedule = []
+        self.logger.info("Sampler schedule: generating current bag schedule:")
         for bag_event in self.complete_bag_schedule:
-            bag_number, time_on, time_off = bag_event..get_bag_event()
-            if time_on - self.pump_timedelta_before_valve > current_time:
-                current_bag_schedule.append([bag_number, time_on, time_off])
-        self.logger.info("Generated current bag schedule:\n{}".format(current_bag_schedule))
+            if bag_event.get_bag_time_on() - self.pump_timedelta_before_valve > current_time:
+                current_bag_schedule.append(bag_event)
+                #self.logger.info("Sampler schedule: {}, {}, {}".format(bag_event.get_bag_event())
         return current_bag_schedule
 
     def get_current_valve_schedule(self, current_time):
