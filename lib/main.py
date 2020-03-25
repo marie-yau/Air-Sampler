@@ -3,6 +3,7 @@ import time
 import logging
 import sys
 import threading
+import sys
 
 from sampler_schedule import *
 from sampler import *
@@ -11,6 +12,7 @@ from configuration import *
 from usb_drive import *
 from logger import *
 from diode import *
+from settings import *
 
 def update_schedules_and_configuration(usb, ID, logger):
     """
@@ -71,8 +73,13 @@ while True:
     if usb.is_inserted():
         valves_schedule, pump_schedule, sampler, diode = update_schedules_and_configuration(usb, ID_number, logger)
         # get next valve and pump event from the iterators
-        valve_event = next(valves_schedule)
-        pump_event = next(pump_schedule)
+        try:
+            valve_event = next(valves_schedule)
+            pump_event = next(pump_schedule)
+        except StopIteration:
+            logger.error("Main: no current pump or valve events to execute, exiting the program")
+            reset_gpio_pins()
+            sys.exit()
         break
     time.sleep(1)
 
@@ -80,7 +87,8 @@ while True:
 diode_light_thread = threading.Thread(target=diode.turn_diode_on, args=(diode.get_diode_time_on_in_seconds(),))
 diode_light_thread.start()
 
-# this while loop never stops to allow user to reinsert usb with a new schedule even after the current schedule finished
+pump_schedule_finished = False
+valve_schedule_finished = False
 while True:
     # when usb is reinserted, immediately finish the current sample (turn the pump off, close all valves) and update the
     # schedules and configuration
@@ -88,8 +96,14 @@ while True:
         sampler.turn_pump_off()
         sampler.close_all_valves()
         valves_schedule, pump_schedule, sampler = update_schedules_and_configuration(usb, ID_number, logger)
-        valve_event = next(valves_schedule)
-        pump_event = next(pump_schedule)
+        try:
+            valve_event = next(valves_schedule)
+            pump_event = next(pump_schedule)
+        except StopIteration:
+            logger.error("Main: no current pump or valve events to execute, exiting the program")
+            reset_gpio_pins()
+            sys.exit()
+        break
         diode_light_thread = threading.Thread(target=diode.turn_diode_on, args=(diode.get_diode_time_on_in_seconds(),))
         diode_light_thread.start()
     # get current time without microseconds
@@ -102,6 +116,7 @@ while True:
         try:
             pump_event = next(pump_schedule)
         except StopIteration:
+            pump_schedule_finished = True
             pass
     if current_time == valve_event.get_valve_time():
         if valve_event.get_valve_action() == "open valve":
@@ -111,6 +126,11 @@ while True:
         try:
             valve_event = next(valves_schedule)
         except StopIteration:
+            valve_schedule_finished = True
             pass
+        
+    if valve_schedule_finished and pump_schedule_finished:
+        reset_gpio_pins()
+        sys.exit()
     # run the while loop once a second
     time.sleep(1)
