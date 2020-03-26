@@ -11,8 +11,8 @@ class Configuration():
     """
     Class for reading configuration from a text file. An example of the required format is below.
     The headers for the lines ("Numbering mode", "Bag numbers to valve pin numbers", etc) have to be exactly in the
-    same format as listed below. No additional blank lines are allowed anywhere in the file. Refer to the user_manual.md
-    for more details on file format requirements and the exact meaning of each line.
+    same format as listed below. No additional blank lines are allowed anywhere in the file.
+    Refer to the user_manual.md for more details on file format requirements and the exact meaning of each line.
     ----------------
     Numbering mode
     BCM

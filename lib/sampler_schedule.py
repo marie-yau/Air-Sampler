@@ -11,6 +11,21 @@ from valve_event import *
 from bag_event import *
 
 class SamplerSchedule():
+    """
+    Class for reading schedule from a text file and generating bag, valve and pump schedules. An example of the required
+    format is below.
+    The header line ("Bag number, Start filling, Stop filling") has to be exactly in the same format as listed below.
+    Line starting with `#` are considered to be comments and are ignored. No blank lines are allowed anywhere in the file.
+    Refer to the user_manual.md for more details on file format requirements.
+    --------------------------------------------
+    Bag number, Start filling, Stop filling
+    3,  2020-03-06 11:38:00,  2020-03-06 11:38:30
+    1,  2020-03-06 11:38:15,  2020-03-06 11:38:40
+    # this is a comment
+    2,  2020-03-06 11:39:15,  2020-03-06 11:39:35
+    1,  2020-03-06 11:40:00,  2020-03-06 11:40:30
+    ---------------------------------------------
+    """
 
     def __init__(self, file_path, pump_start_before, pump_end_after, pump_tolerance, logger):
         """
