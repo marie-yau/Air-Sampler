@@ -18,10 +18,11 @@ def log_uncaught_exception(exception_type, exception_object, traceback):
     filename = traceback.tb_frame.f_code.co_filename
     linecache.checkcache(filename)
     line = linecache.getline(filename, traceback.tb_lineno, traceback.tb_frame.f_globals)
-    logging.getLogger().exception('Exception raised in file ({}, line {} "{}"): {}'.format(filename,
-                                                                                           traceback.tb_lineno,
-                                                                                           line.strip(),
-                                                                                           exception_object))
+    logging.getLogger().exception('Exception {} raised in file ({}, line {} "{}"): {}'.format(exception_type,
+                                                                                              filename,
+                                                                                              traceback.tb_lineno,
+                                                                                              line.strip(),
+                                                                                              exception_object))
     # set all GPIOs to output and turn them off
     settings.reset_gpio_pins()
 
