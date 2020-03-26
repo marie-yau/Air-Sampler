@@ -3,7 +3,7 @@
 This application is a software tool for operating airsampler that takes air samples according to the specified schedule. 
 
 ## Understanding how airsampler works
-The airsampler consists of Raspberry Pi, power source, pump, tubing, thirteen solenoid valves and bags. 
+
 
 ## Schedule file format
 Schedule file contains information necessary to take the air samples.
@@ -47,6 +47,8 @@ The configuration file contains the following information:
 	- Identifies the GPIO number that the pump is connected to.
 - ```Diode pin number```
 	- Identifies the GPIO number that the diode is connected to.
+- ```Diode light duration```
+	- Specifies the number of seconds the diode stays turned on to indicate that the hardware and software was set up correctly.
 - ```Number of seconds pump starts pumping before valve opens```
 	- Specifies the number of seconds the pump starts pumping before a valve opens.
 - ```Number of seconds pump continues pumping after valve closes```
@@ -59,6 +61,7 @@ Format requirements:
 - The file name must be ```<sampler ID>_config.txt```. For example, if the sampler has ID 90, its configuration file is ```90_config.txt```.
 - No additional lines (blank lines included) are allowed anywhere in the file. 
 - The headers for the lines (```Numbering mode```, ```Bag numbers to valve pin numbers```, etc) have to be exactly in the same format as listed below. 
+- The headers can be in any order.
 - There may be white spaces in the beggining and in the end of each line.
 - The line below the ```Bag numbers to valve pin numbers``` line must be in format ```<bag number 1> : <GPIO number 1>, ..., <bag number n> : <GPIO number n>```. For example, ```1: 19, 2: 4, 3: 22```. All whites spaces on this line are ignored.
 
@@ -73,6 +76,8 @@ An example of the required configuration file:
 	13
 	Diode pin number
 	17
+	Diode light duration
+	3
 	Number of seconds pump starts pumping before valve opens
 	5
 	Number of seconds pump continues pumping after valve closes
