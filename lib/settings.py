@@ -1,5 +1,6 @@
 # library for board and Broadcom numbering modes
 import RPi.GPIO as GPIO
+import logging
 
 def set_board_numbering_mode(mode):
     """
@@ -18,6 +19,7 @@ def disable_gpio_warnings():
     Disables all GPIO warnings.
     """
     GPIO.setwarnings(False)
+    logging.info("settings.py: disabled GPIO warnings")
 
 def reset_gpio_pins():
     """
@@ -28,3 +30,4 @@ def reset_gpio_pins():
     for pin_number in range(0, 28):
         GPIO.setup(pin_number, GPIO.OUT)
         GPIO.output(pin_number, 0)
+    logging.info("settings.py: set all GPIOs as outputs and set the outputs to False")

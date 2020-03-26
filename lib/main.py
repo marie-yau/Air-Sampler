@@ -19,15 +19,9 @@ def update_schedules_and_configuration(usb, ID, logger):
     Update valve schedule, pump schedule and the configuration of sampler based on its ID number and the files on the
     inserted USB drive.
     :param usb: `USB_drive` object (exactly one USB must be inserted)
-    :param ID: integer representing the ID number of the sampler
-    :return: tuple containing:
-                + iterator over list of `ValveEvent` objects
-                + iterator over list of `PumpEvent` objects
-                + `Sampler` object
-                + `Diode` object
+    :param ID: Integer that represents the ID number of the sampler
+    :return: Iterator over list of `valve_event` objects, iterator over list of `pump_event` objects, `Sampler` object
     """
-    # check if usb is inserted and get path to schedule and configuration files
-    assert(usb.is_inserted())
     path_to_schedule_file = usb.get_path_for_schedule_file(ID)
     path_to_configuration_file = usb.get_path_for_configuration_file(ID)
     # read configuration for sampler from the configuration file
@@ -56,17 +50,18 @@ def update_schedules_and_configuration(usb, ID, logger):
     pump_schedule = iter(schedules_for_sampler.get_current_pump_schedule(current_time))
     return valves_schedule, pump_schedule, sampler, diode
 
-# disable all GPIO warnings and set outputs of all GPIOs to 0
-disable_gpio_warnings()
-reset_gpio_pins()
-
 # create logger object for logging events and errors
 current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-logging.basicConfig(filename=current_time + ".log",
+file_path = "/home/pi/Desktop/sampler_logs/" + current_time + ".log"
+logging.basicConfig(filename=file_path,
                     format="%(asctime)s %(message)s",
                     filemode="w",
                     level=logging.DEBUG)
 logger = logging.getLogger()
+logger.info("main.py: program started")
+
+disable_gpio_warnings()
+reset_gpio_pins()
 
 # handle uncaught exception and safely exit the program
 sys.excepthook = log_uncaught_exception
@@ -78,7 +73,7 @@ with open(path_to_ID_number_file, "r") as file:
 ID_number = int(content)
 
 # wait for USB to be inserted
-usb = USB_drive()
+usb = USB_drive(logger)
 while True:
     if usb.is_inserted():
         valves_schedule, pump_schedule, sampler, diode = update_schedules_and_configuration(usb, ID_number, logger)
@@ -87,7 +82,7 @@ while True:
             valve_event = next(valves_schedule)
             pump_event = next(pump_schedule)
         except StopIteration:
-            logger.error("Main: no current pump or valve events to execute, exiting the program")
+            logger.error("main.py: no current pump or valve events to execute, exiting the program")
             reset_gpio_pins()
             sys.exit()
         break
@@ -105,7 +100,7 @@ while True:
     if usb.was_reinserted():
         sampler.turn_pump_off()
         sampler.close_all_valves()
-        valves_schedule, pump_schedule, sampler, diode = update_schedules_and_configuration(usb, ID_number, logger)
+        valves_schedule, pump_schedule, sampler = update_schedules_and_configuration(usb, ID_number, logger)
         try:
             valve_event = next(valves_schedule)
             pump_event = next(pump_schedule)
@@ -113,8 +108,8 @@ while True:
             logger.error("main.py: no current pump or valve events to execute, exiting the program")
             reset_gpio_pins()
             sys.exit()
-        # turn diode on to indicate schedule and configuration file were read correctly
-        diode_light_thread = threading.Thread(target=diode.turn_diode_on, args=(diode.get_diode_light_duration_in_seconds(),))
+        break
+        diode_light_thread = threading.Thread(target=diode.turn_diode_on, args=(diode.get_diode_time_on_in_seconds(),))
         diode_light_thread.start()
     # get current time without microseconds
     current_time = datetime.now().replace(microsecond=0)

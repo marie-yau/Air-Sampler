@@ -129,7 +129,7 @@ class Configuration():
         :param time: string representing the number of seconds that diode stays turned on
         """
         self.diode_light_duration = timedelta(seconds=int(time))
-        self.logger.info("Configuration.py: set diode time on to {}".format(self.diode_light_duration))
+        self.logger.info("Configuration.py: set diode light duration to {}".format(self.diode_light_duration))
 
     def set_pump_starts_before(self, number_of_seconds):
         """
