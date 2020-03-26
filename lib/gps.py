@@ -4,15 +4,16 @@ Package for GPS module.
 
 import serial
 from time import time
+
 from geographic_position import *
 
 class GPS():
     """
-    Class for reading the geographic position from GPS module.
+    Class for reading the geographic position from a GPS module.
     """
     def __init__(self):
         """
-        Set the type of sentence that will be read from GPS to GPGGA and the serial port for the GPS.
+        Sets the type of sentence that will be read from GPS to GPGGA and the serial port for the GPS.
         GPGGA stands for Global Positioning System Fix Data. An example sentence is $GPGGA,134658.00,5106.9792,N,
         11402.3003,W,2,09,1.0,1048.47,M,-16.27,M,08,AAAA*60" where $GPGGA is a sentence identifier, 134658.00 is time
         (13:46:58 and 00 miliseconds), 5106.9792 is latitude (51 degrees and 06.9792 minutes), N is latitude direction
@@ -59,8 +60,8 @@ class GPS():
         Converts NMEA position format to degrees.
         The NMEA position format is DDmm.mm for latitude and DDDmm.mm for longitude. DD or DDD stands for degrees and
         mm.mm stands for minutes
-        :param nmea_value: String representing a position in the NMEA format
-        :return: Float that represents the converted values of the NMEA string in degrees
+        :param nmea_value: string representing a position in the NMEA format
+        :return: float representing the converted values of the NMEA string in degrees
         """
         # verify that `nmea_value` is either string that is convertible to float number or empty string
         assert(nmea_value == "" or nmea_value.replace('.','',1).isdigit())

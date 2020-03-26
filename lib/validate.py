@@ -1,8 +1,8 @@
 def is_valid_GPIO_pin_number(pin_number, mode):
     """
-    Verify whether `pin_number` is a valid GPIO pin number in the `mode` numbering mode.
-    :param pin_number: Integer that represents GPIO pin number
-    :param mode: String that represents Pi's numbering mode, must be either "BCM" or "BOARD
+    Verifies whether `pin_number` is a valid GPIO pin number in the `mode` numbering mode.
+    :param pin_number: integer representing GPIO pin number
+    :param mode: string representing Pi's numbering mode, must be either "BCM" or "BOARD
     :return: True if the `pin_number` is a valid GPIO pin number, otherwise returns False
     """
     gpios_in_BCM_mode = [n for n in range(0,28)]

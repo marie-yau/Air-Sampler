@@ -5,7 +5,7 @@ def set_board_numbering_mode(mode):
     """
     Set board numbering mode to either "BCM" (the GPIO is identified by the number that is used by Broadcom, the
     manufacturer) or "BOARD" (the GPIO is identified by the position on the Pi).
-    :param mode: String that represents a board numbering mode. Must be either "BCM" or "BOARD".
+    :param mode: string representing a board numbering mode. Must be either "BCM" or "BOARD".
     """
     assert (mode == "BCM" or mode == "BOARD")
     if mode == "BCM":

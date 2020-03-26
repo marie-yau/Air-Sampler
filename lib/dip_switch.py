@@ -3,19 +3,20 @@ Read dual inline package (DIP) switches.
 """
 
 import RPi.GPIO as GPIO
+
 import settings
 import validate
 
 class DIPSwitch():
     """
-    Read dual inline package (DIP) switches.
+    Reads dual inline package (DIP) switches.
     """
     def __init__(self, dip_switch_pin_numbers, mode):
         """
-        :param dip_switch_pin_numbers: List of at least one integer that represent unique valid pin numbers of the Pi
-                that the DIP switch is connected to. The pins in the list are ordered low-to-high.
-                E.g. DIP switch has two switches. Switch with physical number 1 is connected to GPIO 26 and switch with
-                number 2 to GPIO 19, so the `dip_switch_pin_numbers` is equal to [26,19].
+        :param dip_switch_pin_numbers: list of at least one integer representing unique valid pin numbers of the Pi
+        that the DIP switch is connected to. The pins in the list are ordered low-to-high. E.g. DIP switch has two
+        switches. Switch with physical number 1 is connected to GPIO 26 and switch with number 2 to GPIO 19, so the
+        `dip_switch_pin_numbers` is equal to [26,19].
         :param mode: string that represents a board numbering mode. Must be either "BCM" or "BOARD".
         """
         # set board numbering mode
@@ -26,8 +27,8 @@ class DIPSwitch():
 
     def _set_dip_switch_pin_numbers(self, dip_switch_pin_numbers):
         """
-        Check if `dip_switch_pin_numbers` is a list of valid pin numbers and set `self.dip_switch_pin_numbers`.
-        :param dip_switch_pin_numbers: List of at least one integer that represents the pin numbers of the Pi that the
+        Checks if `dip_switch_pin_numbers` is a list of valid pin numbers and set `self.dip_switch_pin_numbers`.
+        :param dip_switch_pin_numbers: list of at least one integer that represents the pin numbers of the Pi that the
                 DIP switch is connected to.
                 `dip_switch_pin_numbers` must satisfy the following conditions:
                 + contains at least one integer
@@ -45,7 +46,7 @@ class DIPSwitch():
 
     def _read_switch_positions(self):
         """
-        Read the pin numbers of the Pi that the DIP switch is connected to and set items in the `self.switch_positions`
+        Reads the pin numbers of the Pi that the DIP switch is connected to and set items in the `self.switch_positions`
         list to "1" if the switch is in on position and to "0" if the switch is in off position. The switch positions
         in the `self.switch_positions` list correspond to the pin numbers in the `self.dip_switch_pin_numbers` list.
         E.g. When `self.dip_switch_pin_numbers` is equal to [26,19] and GPIO 26 is off and GPIO 19 is on, the
@@ -57,9 +58,9 @@ class DIPSwitch():
 
     def get_switch_position(self, switch_number):
         """
-        Get position of specified switch in DIP switch.
-        :param switch_number: Integer that represents the physical number of switch in DIP switch. The numbers of switches
-                are written on the DIP switch.
+        Gets position of specified switch in DIP switch.
+        :param switch_number: integer representing the physical number of switch in DIP switch. The numbers of switches
+        are written on the DIP switch.
         :return: "0" if switch with `switch number` is in off position or "1" if switch is in on position.
         """
         self._read_switch_positions()
@@ -69,10 +70,10 @@ class DIPSwitch():
 
     def get_switch_positions(self):
         """
-        Get positions of all switches in DIP switch.
+        Gets positions of all switches in DIP switch.
         :return: List of "1"s and "0"s that represent on and off positions of all switches in DIP switch. The switch
-                positions in the `self.switch_positions` list correspond to the pin numbers in the
-                `self.dip_switch_pin_numbers` list.
+        positions in the `self.switch_positions` list correspond to the pin numbers in the`self.dip_switch_pin_numbers`
+        list.
         """
         self._read_switch_positions()
         return self.switch_positions
@@ -80,9 +81,9 @@ class DIPSwitch():
     @staticmethod
     def convert_switch_positions_to_decimal_number(switch_positions):
         """
-        Convert "1" and "0" switch positions in `switch_positions` list to a decimal number.
+        Converts "1" and "0" switch positions in `switch_positions` list to a decimal number.
         E.g. list ["0","1","1"] is converted to decimal number 6.
-        :param switch_positions: List of "1"s and "0"s that represent switch positions in the DIP switch. The list
+        :param switch_positions: list of "1"s and "0"s that represent switch positions in the DIP switch. The list
                 should be ordered low-to-high (position of switch with the lowest physical number should be in position
                 0 in the `switch_positions` list).
         :return: Integer that represents a decimal number converted from binary number in form of list of "1" and "0".
@@ -99,7 +100,7 @@ class DIPSwitch():
 
     def __del__(self):
         """
-        Set all pins in `self.dip_switch_pin_numbers` as inputs.
+        Sets all pins in `self.dip_switch_pin_numbers` as inputs.
         """
         GPIO.cleanup(self.dip_switch_pin_numbers)
 

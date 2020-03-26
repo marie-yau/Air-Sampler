@@ -1,18 +1,18 @@
 """
-Read configuration from a file.
+Read hardware and software configuration from a file.
 """
 
 from datetime import timedelta
-import os
 import logging
 
 import validate
 
 class Configuration():
     """
-    Class for reading configuration from a text file. The example of the required format is below.
+    Class for reading configuration from a text file. An example of the required format is below.
     The headers for the lines ("Numbering mode", "Bag numbers to valve pin numbers", etc) have to be exactly in the
-    same format as listed below. No additional blank lines are allowed anywhere in the file.
+    same format as listed below. No additional blank lines are allowed anywhere in the file. Refer to the user_manual.md
+    for more details on file format requirements and the exact meaning of each line.
     ----------------
     Numbering mode
     BCM
@@ -22,6 +22,8 @@ class Configuration():
     13
     Diode pin number
     17
+    Diode light duration
+    3
     Number of seconds pump starts pumping before valve opens
     5
     Number of seconds pump continues pumping after valve closes
@@ -32,14 +34,14 @@ class Configuration():
     """
     __slots__ = ["bag_numbers_to_valve_pin_numbers_dict", "pump_pin_number", "diode_pin_number", "numbering_mode",
                  "pump_starts_before", "pump_stops_after", "pump_time_off_tolerance", "logger",
-                 "diode_time_on"]
+                 "diode_light_duration"]
 
     def __init__(self, file_path, logger):
         """
         :param file_path: string representing a path to the configuration file
+        :param logger: `logging.Logger` object used for logging actions of `Configuration` object
         """
-        # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
-        self.logger = logger
+        self.set_logger(logger)
         self._read_configuration_file(file_path)
 
     def _read_configuration_file(self, file_path):
@@ -60,33 +62,39 @@ class Configuration():
                 self.set_pump_pin_number(next(lines_iterator))
             elif line == "Diode pin number":
                 self.set_diode_pin_number(next(lines_iterator))
-            elif line == "Diode time on":
-                self.set_diode_time_on(next(lines_iterator))
+            elif line == "Diode light duration":
+                self.set_diode_light_duration(next(lines_iterator))
             elif line == "Number of seconds pump starts pumping before valve opens":
                 self.set_pump_starts_before(next(lines_iterator))
             elif line == "Number of seconds pump continues pumping after valve closes":
                 self.set_pump_stops_after(next(lines_iterator))
             elif line == "Pump time off tolerance in seconds":
                 self.set_pump_time_off_tolerance(next(lines_iterator))
-            # if header of line in not in the required format, raise ValueError
             else:
-                raise ValueError("invalid line format in the configuration file")
+                raise ValueError("invalid header line format in the configuration file")
+
+    def set_logger(self, logger):
+        """
+        :param logger: `logging.Logger` object used for logging actions of `Configuration` object
+        """
+        assert(isinstance(logger, logging.Logger))
+        self.logger = logger
 
     def set_numbering_mode(self, mode):
         """
-        :param mode: String representing Pi's numbering mode, must be "BCM" or "BOARD"
+        :param mode: string representing Pi's numbering mode, must be "BCM" or "BOARD"
         """
         assert(mode == "BCM" or mode == "BOARD")
         self.numbering_mode = mode
-        self.logger.info("configuration: set numbering mode to {}".format(self.numbering_mode))
+        self.logger.info("configuration.py: set numbering mode to {}".format(self.numbering_mode))
 
     def set_bag_numbers_to_valve_pin_numbers_dict(self, line):
         """
         The function sets a dictionary `self.bag_numbers_to_valve_pin_numbers_dict` to contain bag numbers as keys and
-        corresponding GPIO numbers as values.
-        :param line: String in the format "1: 19, 2: 4". The number in front of : (e.g. 1) represents the bag number
+        their corresponding GPIO numbers as values.
+        :param line: string in the format "1: 19, 2: 4". The number in front of : (e.g. 1) represents the bag number
         and the number after : (e.g. 19) represents the GPIO number that the corresponding valve is connected to. Every
-        bag-GPIO pair must be separated by comma. Comma in the end of the line is not allowed.
+        bag-GPIO pair must be separated by comma. Comma at the end of the line is not allowed.
         """
         bag_numbers_and_valve_pin_numbers = line.split(",")
         self.bag_numbers_to_valve_pin_numbers_dict = {}
@@ -95,96 +103,103 @@ class Configuration():
             bag_number = int(bag.strip())
             valve_number = int(valve.strip())
             self.bag_numbers_to_valve_pin_numbers_dict[bag_number] = valve_number
-        self.logger.info("configuration: set bag numbers to GPIO number dictionary to {}".format(self.bag_numbers_to_valve_pin_numbers_dict))
+        self.logger.info("configuration.py: set bag numbers to GPIO number dictionary to {}"
+                         .format(self.bag_numbers_to_valve_pin_numbers_dict))
 
     def set_pump_pin_number(self, pin):
         """
-        :param pin: String representing the GPIO pin number that the pump is connected to
+        :param pin: string representing the GPIO pin number that the pump is connected to
         """
         pin_number = int(pin)
         assert(validate.is_valid_GPIO_pin_number(pin_number, self.numbering_mode))
         self.pump_pin_number = pin_number
-        self.logger.info("configuration: set pump GPIO number to {}".format(self.pump_pin_number))
+        self.logger.info("configuration.py: set pump GPIO number to {}".format(self.pump_pin_number))
 
     def set_diode_pin_number(self, pin):
         """
-        :param pin: String representing the GPIO pin number that the diode is connected to
+        :param pin: string representing the GPIO pin number that the diode is connected to
         """
         pin_number = int(pin)
         assert(validate.is_valid_GPIO_pin_number(pin_number, self.numbering_mode))
         self.diode_pin_number = pin_number
-        self.logger.info("configuration: set diode GPIO pin number to {}".format(self.diode_pin_number))
+        self.logger.info("configuration.py: set diode GPIO pin number to {}".format(self.diode_pin_number))
 
-    def set_diode_time_on(self, time):
-        self.diode_time_on = timedelta(seconds=int(time))
-        self.logger.info("Configuration: set diode time on to {}".format(self.diode_time_on))
+    def set_diode_light_duration(self, time):
+        """
+        :param time: string representing the number of seconds that diode stays turned on
+        """
+        self.diode_light_duration = timedelta(seconds=int(time))
+        self.logger.info("Configuration.py: set diode time on to {}".format(self.diode_light_duration))
 
     def set_pump_starts_before(self, number_of_seconds):
         """
-        :param number_of_seconds: String representing the number of seconds that the pump starts pumping before the
+        :param number_of_seconds: string representing the number of seconds that the pump starts pumping before the
         valve opens
         """
         self.pump_starts_before = timedelta(seconds=int(number_of_seconds))
-        self.logger.info("configuration: set pump starts before valve opens to {}".format(self.pump_starts_before))
+        self.logger.info("configuration.py: set pump starts before valve opens to {}".format(self.pump_starts_before))
 
     def set_pump_stops_after(self, number_of_seconds):
         """
-        :param number_of_seconds: String representing the number of seconds that the pump keeps pumping after the
+        :param number_of_seconds: string representing the number of seconds that the pump keeps pumping after the
         valve closes
         """
         self.pump_stops_after = timedelta(seconds=int(number_of_seconds))
-        self.logger.info("configuration: set pump stops after valve closes to {}".format(self.pump_stops_after))
+        self.logger.info("configuration.py: set pump stops after valve closes to {}".format(self.pump_stops_after))
 
     def set_pump_time_off_tolerance(self, number_of_seconds):
         """
-        :param number_of_seconds: String representing the number of seconds. If pump is supposed to turn off for less
-        than specified number of seconds, it will continue pumping.
+        :param number_of_seconds: string representing the number of seconds. If pump is supposed to turn off for less
+        than specified number of seconds, it will continue pumping
         """
         self.pump_time_off_tolerance = timedelta(seconds=int(number_of_seconds))
-        self.logger.info("configuration: set pump time off tolerance to {}".format(self.pump_time_off_tolerance))
+        self.logger.info("configuration.py: set pump time off tolerance to {}".format(self.pump_time_off_tolerance))
 
     def get_numbering_mode(self):
         """
-        :return: String representing Pi's numbering mode ("BCM" or "BOARD")
+        :return: string representing Pi's numbering mode ("BCM" or "BOARD")
         """
         return self.numbering_mode
 
     def get_bag_numbers_to_valve_pin_numbers_dict(self):
         """
-        :return: Dictionary containing bag numbers (integers) as keys and corresponding GPIO numbers (integers) as values
+        :return: dictionary containing bag numbers (integers) as keys and corresponding GPIO numbers (integers) as values
         """
         return self.bag_numbers_to_valve_pin_numbers_dict
 
     def get_pump_pin_number(self):
         """
-        :return: Integer that represents the GPIO pin number that the pump is connected to
+        :return: integer representing the GPIO pin number that the pump is connected to
         """
         return self.pump_pin_number
 
     def get_diode_pin_number(self):
         """
-        :return: Integer that represents the GPIO pin number that the diode is connected to
+        :return: integer representing the GPIO pin number that the diode is connected to
         """
         return self.diode_pin_number
 
-    def get_diode_time_on(self):
-        return self.diode_time_on
+    def get_diode_light_duration(self):
+        """
+        :return: integer representing the number of seconds that diode stays turned on
+        """
+        return self.diode_light_duration
 
     def get_pump_starts_before(self):
         """
-        :return: Integer that represents the number of seconds that the pump starts pumping before the valve opens
+        :return: integer representing the number of seconds that the pump starts pumping before the valve opens
         """
         return self.pump_starts_before
 
     def get_pump_stops_after(self):
         """
-        :return: Integer that represents the number of seconds that the pump keeps pumping after the valve closes
+        :return: integer representing the number of seconds that the pump keeps pumping after the valve closes
         """
         return self.pump_stops_after
 
     def get_pump_time_off_tolerance(self):
         """
-        :return: Integer that represents the number of seconds. If pump is supposed to turn off for less than specified
+        :return: integer representing the number of seconds. If pump is supposed to turn off for less than specified
         number of seconds, it will continue pumping.
         """
         return self.pump_time_off_tolerance
@@ -198,7 +213,7 @@ if __name__ == "__main__":
     print("Bag numbers to valve pin numbers:", configuration.get_bag_numbers_to_valve_pin_numbers_dict())
     print("Pump pin number:", configuration.get_pump_pin_number())
     print("Diode pin number:", configuration.get_diode_pin_number())
-    print("Diode time on:", configuration.get_diode_time_on())
+    print("Diode light duration:", configuration.get_diode_light_duration())
     print("Pump starts before:", configuration.get_pump_starts_before())
     print("Pump stops after:", configuration.get_pump_stops_after())
     print("Pump time off tolerance:", configuration.get_pump_time_off_tolerance())

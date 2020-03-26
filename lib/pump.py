@@ -3,10 +3,11 @@ Package for pump.
 """
 
 import RPi.GPIO as GPIO
-import settings
-import validate
 import time
 import logging
+
+import settings
+import validate
 
 class Pump():
     """
@@ -15,21 +16,32 @@ class Pump():
     __slots__ = ["pump_pin_number", "pump_on", "mode", "logger"]
 
     def __init__(self, pump_pin_number, mode, logger):
-        # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
-        self.logger = logger
+        """
+        :param pump_pin_number: integer representing the GPIO pin number that the pump is connected to
+        :param mode: string representing the Pi's numbering mode, must be "BCM" or "BOARD"
+        :param logger: `logging.Logger` object used for logging actions of the object
+        """
+        self.set_logger(logger)
         # set board numbering mode for the Pi (either "BCM" or "BOARD")
         settings.set_board_numbering_mode(mode)
         self.mode = mode
         self.set_pump_pin_number(pump_pin_number)
         self.__pump_setup()
 
+    def set_logger(self, logger):
+        """
+        :param logger: `logging.Logger` object used for logging actions of the object
+        """
+        assert(isinstance(logger, logging.Logger))
+        self.logger = logger
+
     def set_pump_pin_number(self, pump_pin_number):
         """
-        :param pump_pin_number: Integer representing the GPIO pin number that the pump is connected to.
+        :param pump_pin_number: integer representing the GPIO pin number that the pump is connected to
         """
         assert(validate.is_valid_GPIO_pin_number(pump_pin_number, self.mode))
         self.pump_pin_number = pump_pin_number
-        self.logger.info("pump: pump GPIO number set to {} {}".format(self.pump_pin_number, self.mode))
+        self.logger.info("pump.py: pump GPIO number set to {} {}".format(self.pump_pin_number, self.mode))
 
     def __pump_setup(self):
         """
@@ -41,12 +53,12 @@ class Pump():
     def start_pumping(self):
         GPIO.output(self.pump_pin_number, 1)
         self.pump_on = True
-        self.logger.info("pump: pump started pumping")
+        self.logger.info("pump.py: pump started pumping")
 
     def stop_pumping(self):
         GPIO.output(self.pump_pin_number, 0)
         self.pump_on = False
-        self.logger.info("pump: pump stopped pumping")
+        self.logger.info("pump.py: pump stopped pumping")
 
     def is_pumping(self):
         """

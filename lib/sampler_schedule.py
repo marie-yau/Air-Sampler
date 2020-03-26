@@ -13,8 +13,17 @@ from bag_event import *
 class SamplerSchedule():
 
     def __init__(self, file_path, pump_start_before, pump_end_after, pump_tolerance, logger):
-        # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
-        self.logger = logger
+        """
+        :param file_path: string representing the path to the schedule file
+        :param pump_start_before: `timedelta` object representing the number of seconds that the pump starts pumping
+        before the valve opens
+        :param pump_end_after: `timedelta` object representing the number of seconds that the pump keeps pumping after
+        the valve closes
+        :param pump_tolerance: `timedelta` object representing the number of seconds. If pump is supposed to turn off
+        for less than specified number of seconds, it will continue pumping.
+        :param logger: `logging.Logger` object used for logging actions of the object
+        """
+        self.set_logger(logger)
         self.set_pump_timedelta_before_valve(pump_start_before)
         self.set_pump_timedelta_after_valve(pump_end_after)
         self.set_pump_off_time_tolerance(pump_tolerance)
@@ -23,22 +32,44 @@ class SamplerSchedule():
         self._create_valve_schedule(self.complete_bag_schedule)
         self._create_pump_schedule(self.complete_bag_schedule)
 
+    def set_logger(self, logger):
+        """
+        :param logger: `logging.Logger` object used for logging actions of the object
+        """
+        assert(isinstance(logger, logging.Logger))
+        self.logger = logger
+
     def set_pump_timedelta_before_valve(self, pump_start_before):
+        """
+        :param pump_start_before: `timedelta` object representing the number of seconds that the pump starts pumping
+        before the valve opens
+        """
         assert(isinstance(pump_start_before, timedelta))
         self.pump_timedelta_before_valve = pump_start_before
-        self.logger.info("Sampler schedule: set pump to start {} before valve opens".format(self.pump_timedelta_before_valve))
+        self.logger.info("sampler_schedule.py: set pump to start {} before valve opens".format(self.pump_timedelta_before_valve))
 
     def set_pump_timedelta_after_valve(self, pump_end_after):
+        """
+        :param pump_end_after: `timedelta` object representing the number of seconds that the pump keeps pumping after
+        the valve closes
+        """
         assert (isinstance(pump_end_after, timedelta))
         self.pump_timedelta_after_valve = pump_end_after
-        self.logger.info("Sampler schedule: set pump to stop {} after valve closes".format(self.pump_timedelta_after_valve))
+        self.logger.info("sampler_schedule.py: set pump to stop {} after valve closes".format(self.pump_timedelta_after_valve))
 
     def set_pump_off_time_tolerance(self, pump_tolerance):
+        """
+        :param pump_tolerance: `timedelta` object representing the number of seconds. If pump is supposed to turn off
+        for less than specified number of seconds, it will continue pumping.
+        """
         assert (isinstance(pump_tolerance, timedelta))
         self.pump_off_time_tolerance = pump_tolerance
-        self.logger.info("Sampler schedule: set pump time off tolerance to {}".format(self.pump_off_time_tolerance))
+        self.logger.info("sampler_schedule.py: set pump time off tolerance to {}".format(self.pump_off_time_tolerance))
         
     def _read_bag_schedule(self):
+        """
+        Reads bag schedule from file and creates a list of `BagEvent` objects based on the schedule.
+        """
         self.complete_bag_schedule = []
         with open(self.file_path) as file:
             # skip header line of file and check its format
@@ -52,16 +83,21 @@ class SamplerSchedule():
                 self.complete_bag_schedule.append(bag_event)
         # sort `self.complete_bag_schedule` by `time_on` in increasing order
         self.complete_bag_schedule.sort(key=lambda event: event.get_bag_time_on())
-        self.logger.info("Sampler schedule: read bag schedule from file {}: {}".format(self.file_path,
-                                                                                       [[bag_event.get_bag_number(),
-                                                                                bag_event.get_bag_time_on().strftime(
-                                                                                    "%Y-%m-%d %H:%M:%S"),
-                                                                                bag_event.get_bag_time_off().strftime(
-                                                                                    "%Y-%m-%d %H:%M:%S")]
-                                                                               for bag_event in
-                                                                               self.complete_bag_schedule]))
+        self.logger.info("sampler_schedule.py: read bag schedule from file {}: {}"
+                         .format(self.file_path,
+                                 [[bag_event.get_bag_number(),
+                                   bag_event.get_bag_time_on().strftime("%Y-%m-%d %H:%M:%S"),
+                                   bag_event.get_bag_time_off().strftime("%Y-%m-%d %H:%M:%S")]
+                                  for bag_event in self.complete_bag_schedule]))
 
     def _create_valve_schedule(self, bag_schedule):
+        """
+        Creates a list of `ValveEvent` objects based on `bag_schedule`
+        :param bag_schedule: list of `BagEvent` objects
+        :return: list of `ValveEvent objects`
+        """
+        # `bag_schedule` list can't be empty
+        assert (len(bag_schedule) > 0)
         valve_schedule = []
         for bag_event in bag_schedule:
             valve_schedule.append(ValveEvent(bag_event.get_bag_time_on(), bag_event.get_bag_number(),  "open valve"))
@@ -71,8 +107,13 @@ class SamplerSchedule():
         return valve_schedule
 
     def _create_pump_schedule(self, bag_schedule):
-        if not bag_schedule:
-            self.logger.error("Sampler schedule: list of bag events is empty, can't create pump schedule")
+        """
+        Creates a list of `PumpEvent` objects based on `bag_schedule`.
+        :param bag_schedule: list of `BagEvent` objects
+        :return: list of `PumpEvent` objects
+        """
+        # `bag_schedule` list can't be empty
+        assert(len(bag_schedule) > 0)
         pump_schedule = []
         # create a list of time intervals when the pump is on, the intervals are in format [time_pump_on, time_pump_off]
         unmerged_pump_on_intervals = [[bag_event.get_bag_time_on() - self.pump_timedelta_before_valve, bag_event.get_bag_time_off()
@@ -96,66 +137,107 @@ class SamplerSchedule():
         return pump_schedule
 
     def get_complete_bag_schedule(self):
-        self.logger.info("Sampler schedule: generated complete bag schedule: {}".format([[bag_event.get_bag_number(),
-                                                                               bag_event.get_bag_time_on().strftime(
-                                                                                   "%Y-%m-%d %H:%M:%S"),
-                                                                               bag_event.get_bag_time_off().strftime(
-                                                                                   "%Y-%m-%d %H:%M:%S")]
-                                                                              for bag_event in self.complete_bag_schedule]))
+        """
+        Creates a list of `BagEvent` objects that contains all `BagEvent` objects created based on the schedule file
+        regardless of their starting time.
+        :return: list of all `BagEvent` objects from the file
+        """
+        self._read_bag_schedule()
+        self.logger.info("sampler_schedule.py: generated complete bag schedule: {}"
+                         .format([[bag_event.get_bag_number(),
+                                   bag_event.get_bag_time_on().strftime("%Y-%m-%d %H:%M:%S"),
+                                   bag_event.get_bag_time_off().strftime("%Y-%m-%d %H:%M:%S")]
+                                  for bag_event in self.complete_bag_schedule]))
         return self.complete_bag_schedule
 
     def get_complete_valve_schedule(self):
+        """
+        Creates a list of `ValveEvent` objects that contains all `ValveEvent` objects generated based on the
+        `self.complete_bag_schedule`, the complete list of `BagEvent` objects.
+        :return: list of all `ValveEvent` objects
+        """
         self._read_bag_schedule()
         complete_valve_schedule = self._create_valve_schedule(self.complete_bag_schedule)
-        self.logger.info("Sampler schedule: generated complete valve schedule: {}".format([[valve_event.get_valve_number(),
-                                                                                            valve_event.get_valve_time().strftime("%Y-%m-%d %H:%M:%S"),
-                                                                                            valve_event.get_valve_action()]
-                                                                                           for valve_event in complete_valve_schedule]))
+        self.logger.info("sampler_schedule.py: generated complete valve schedule: {}"
+                         .format([[valve_event.get_valve_number(),
+                                   valve_event.get_valve_time().strftime("%Y-%m-%d %H:%M:%S"),
+                                   valve_event.get_valve_action()]
+                                  for valve_event in complete_valve_schedule]))
         return complete_valve_schedule
 
     def get_complete_pump_schedule(self):
+        """
+        Creates a list of `PumpEvent` objects that contains all `PumpEvent` objects generated based on the
+        `self.complete_bag_schedule`, the complete list of `BagEvent` objects.
+        :return: list of all `PumpEvent` objects
+        """
         self._read_bag_schedule()
         complete_pump_schedule = self._create_pump_schedule(self.complete_bag_schedule)
-        self.logger.info("Sampler schedule: generated complete pump schedule:{}".format([[pump_event.get_pump_time().strftime("%Y-%m-%d %H:%M:%S"),
-                                                            pump_event.get_pump_action()]
-                                                           for pump_event in complete_pump_schedule]))
+        self.logger.info("sampler_schedule.py: generated complete pump schedule:{}"
+                         .format([[pump_event.get_pump_time().strftime("%Y-%m-%d %H:%M:%S"),
+                                   pump_event.get_pump_action()]
+                                  for pump_event in complete_pump_schedule]))
         return complete_pump_schedule
 
     def get_current_bag_schedule(self, current_time):
+        """
+        Creates a list of `BagEvent` objects that contains only objects that have starting time after
+        `current_time` + `self.pump_timedelta_before_valve`.
+        :param current_time: `datetime` object
+        :return: list of `BagEvent` objects with starting time after `current_time` + `self.pump_timedelta_before_valve`
+        """
         self._read_bag_schedule()
         current_bag_schedule = []
         for bag_event in self.complete_bag_schedule:
             if bag_event.get_bag_time_on() - self.pump_timedelta_before_valve > current_time:
                 current_bag_schedule.append(bag_event)
-        self.logger.info("Sampler schedule: generated current bag schedule: {}".format([[bag_event.get_bag_number(),
-                                                       bag_event.get_bag_time_on().strftime("%Y-%m-%d %H:%M:%S"),
-                                                       bag_event.get_bag_time_off().strftime("%Y-%m-%d %H:%M:%S")]
-                                                       for bag_event in current_bag_schedule]))
+        self.logger.info("sampler_schedule.py: generated current bag schedule: {}"
+                         .format([[bag_event.get_bag_number(),
+                                   bag_event.get_bag_time_on().strftime("%Y-%m-%d %H:%M:%S"),
+                                   bag_event.get_bag_time_off().strftime("%Y-%m-%d %H:%M:%S")]
+                                  for bag_event in current_bag_schedule]))
         return current_bag_schedule
 
     def get_current_valve_schedule(self, current_time):
+        """
+        Creates a list of `ValveEvent` objects that contains only objects that have starting time after
+        `current_time` + `self.pump_timedelta_before_valve`.
+        :param current_time: `datetime` object
+        :return: list of `ValveEvent` objects with starting time after `current_time` + `self.pump_timedelta_before_valve`
+        """
         self._read_bag_schedule()
         current_bag_schedule = self.get_current_bag_schedule(current_time)
         current_valve_schedule = self._create_valve_schedule(current_bag_schedule)
-        self.logger.info("Sampler schedule: generated current valve schedule: {}".format([[valve_event.get_valve_number(),
-                                                                               valve_event.get_valve_time().strftime(
-                                                                                   "%Y-%m-%d %H:%M:%S"),
-                                                                               valve_event.get_valve_action()]
-                                                                              for valve_event in
-                                                                              current_valve_schedule]))
+        self.logger.info("sampler_schedule.py: generated current valve schedule: {}"
+                         .format([[valve_event.get_valve_number(),
+                                   valve_event.get_valve_time().strftime("%Y-%m-%d %H:%M:%S"),
+                                   valve_event.get_valve_action()]
+                                  for valve_event in current_valve_schedule]))
         return current_valve_schedule
 
     def get_current_pump_schedule(self, current_time):
+        """
+        Creates a list of `PumpEvent` objects that contains only objects that have starting time after `current_time`
+        :param current_time: `datetime` object
+        :return: list of `PumpEvent` objects with starting time after `current_time`
+        """
         self._read_bag_schedule()
         current_bag_schedule = self.get_current_bag_schedule(current_time)
         current_pump_schedule = self._create_pump_schedule(current_bag_schedule)
-        self.logger.info("Sampler schedule: generated current pump schedule: {}".format([[pump_event.get_pump_time().strftime("%Y-%m-%d %H:%M:%S"),
-                                                             pump_event.get_pump_action()]
-                                                            for pump_event in current_pump_schedule]))
+        self.logger.info("sampler_schedule.py: generated current pump schedule: {}"
+                         .format([[pump_event.get_pump_time().strftime("%Y-%m-%d %H:%M:%S"),
+                                   pump_event.get_pump_action()]
+                                  for pump_event in current_pump_schedule]))
         return current_pump_schedule
 
     @staticmethod
     def convert_line_to_bag_event(line):
+        """
+        Converts one line from the schedule file to `BagEvent` object.
+        :param line: string representing one line from the schedule file, must be in format
+        "3,  2020-03-06 11:38:00,  2020-03-06 11:38:30"
+        :return: `BagEvent` object
+        """
         bag_info, time_on_info, time_off_info, *rest = line.split(",")
         # check if line contains only three values
         assert(not rest)

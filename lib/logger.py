@@ -5,25 +5,27 @@ Package for logging information to the log file.
 import sys
 import logging
 import settings
+import linecache
 
-def log_uncaught_exception(exception_type, exception_value, traceback):
+def log_uncaught_exception(exception_type, exception_object, traceback):
     """
-    Logs and handles uncaught exception and safely exits the program by logging the exception information to the log
-    file and resetting all GPIOs.
-    :param exception_type: Type of the exception
-    :param exception_value: The value of the exception
-    :param traceback: The place where the exception was raised
+    Safely exits the program by logging the exception information to the log file and resetting all GPIOs.
+    :param exception_type: exception object
+    :param exception_object: string representing the value of the exception
+    :param traceback: traceback object
     """
-    # write details about exception to log file
-    # TODO: the traceback is not very helpful (logs only address where the object is stored). Make it log line number.
-    # I wasn't able to find the function that gives
-    message = "program unexpectedly terminated: " + str(exception_type) + ", " + str(exception_value) + ", " + str(traceback.tb_lineno )
-    logging.getLogger().exception(message)
-    # set all GPIOs to output and turn the off
+
+    filename = traceback.tb_frame.f_code.co_filename
+    linecache.checkcache(filename)
+    line = linecache.getline(filename, traceback.tb_lineno, traceback.tb_frame.f_globals)
+    logging.getLogger().exception('Exception raised in file ({}, line {} "{}"): {}'.format(filename,
+                                                                                           traceback.tb_lineno,
+                                                                                           line.strip(),
+                                                                                           exception_object))
+    # set all GPIOs to output and turn them off
     settings.reset_gpio_pins()
 
 
 if __name__ == "__main__":
     sys.excepthook = log_uncaught_exception
     result = 8 / 0
-    print(result)

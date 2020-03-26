@@ -19,9 +19,15 @@ def update_schedules_and_configuration(usb, ID, logger):
     Update valve schedule, pump schedule and the configuration of sampler based on its ID number and the files on the
     inserted USB drive.
     :param usb: `USB_drive` object (exactly one USB must be inserted)
-    :param ID: Integer that represents the ID number of the sampler
-    :return: Iterator over list of `valve_event` objects, iterator over list of `pump_event` objects, `Sampler` object
+    :param ID: integer representing the ID number of the sampler
+    :return: tuple containing:
+                + iterator over list of `ValveEvent` objects
+                + iterator over list of `PumpEvent` objects
+                + `Sampler` object
+                + `Diode` object
     """
+    # check if usb is inserted and get path to schedule and configuration files
+    assert(usb.is_inserted())
     path_to_schedule_file = usb.get_path_for_schedule_file(ID)
     path_to_configuration_file = usb.get_path_for_configuration_file(ID)
     # read configuration for sampler from the configuration file
@@ -41,7 +47,7 @@ def update_schedules_and_configuration(usb, ID, logger):
     diode = Diode(configuration.get_diode_pin_number(),
                   configuration.get_numbering_mode(),
                   logger)
-    diode.set_diode_time_on(configuration.get_diode_time_on())
+    diode.set_diode_light_duration(configuration.get_diode_light_duration())
 
     current_time = datetime.now()
     # create iterator over lists of `valve_event` objects and `pump_event` objects
@@ -50,6 +56,7 @@ def update_schedules_and_configuration(usb, ID, logger):
     pump_schedule = iter(schedules_for_sampler.get_current_pump_schedule(current_time))
     return valves_schedule, pump_schedule, sampler, diode
 
+# disable all GPIO warnings and set outputs of all GPIOs to 0
 disable_gpio_warnings()
 reset_gpio_pins()
 
@@ -87,7 +94,7 @@ while True:
     time.sleep(1)
 
 # turn diode on to indicate schedule and configuration file were read correctly
-diode_light_thread = threading.Thread(target=diode.turn_diode_on_for, args=(diode.get_diode_time_on_in_seconds(),))
+diode_light_thread = threading.Thread(target=diode.turn_diode_on_for, args=(diode.get_diode_light_duration_in_seconds(),))
 diode_light_thread.start()
 
 pump_schedule_finished = False
@@ -98,16 +105,16 @@ while True:
     if usb.was_reinserted():
         sampler.turn_pump_off()
         sampler.close_all_valves()
-        valves_schedule, pump_schedule, sampler = update_schedules_and_configuration(usb, ID_number, logger)
+        valves_schedule, pump_schedule, sampler, diode = update_schedules_and_configuration(usb, ID_number, logger)
         try:
             valve_event = next(valves_schedule)
             pump_event = next(pump_schedule)
         except StopIteration:
-            logger.error("Main: no current pump or valve events to execute, exiting the program")
+            logger.error("main.py: no current pump or valve events to execute, exiting the program")
             reset_gpio_pins()
             sys.exit()
-        break
-        diode_light_thread = threading.Thread(target=diode.turn_diode_on, args=(diode.get_diode_time_on_in_seconds(),))
+        # turn diode on to indicate schedule and configuration file were read correctly
+        diode_light_thread = threading.Thread(target=diode.turn_diode_on, args=(diode.get_diode_light_duration_in_seconds(),))
         diode_light_thread.start()
     # get current time without microseconds
     current_time = datetime.now().replace(microsecond=0)
@@ -134,7 +141,7 @@ while True:
         
     if valve_schedule_finished and pump_schedule_finished:
         reset_gpio_pins()
-        logger.info("Main: program succesfully")
+        logger.info("main.py: program finished executing the schedule")
         sys.exit()
     # run the while loop once a second
     time.sleep(1)

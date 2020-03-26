@@ -4,6 +4,8 @@ Package for a valve.
 
 import RPi.GPIO as GPIO
 import time
+import logging
+
 import settings
 import validate
 
@@ -14,20 +16,37 @@ class Valve():
     __slots__ = ["valve_pin_number", "valve_open", "mode", "logger"]
 
     def __init__(self, valve_pin_number, mode, logger):
-        # TODO: verify that logger is a logging object, not sure how to do that assert(isinstance(logger, ???)
-        self.logger = logger
+        """
+        :param valve_pin_number: integer representing the GPIO pin number that the valve is connected to
+        :param mode: string representing the Pi's numbering mode, must be "BCM" or "BOARD"
+        :param logger: `logging.Logger` object used for logging actions of the object
+        """
+        self.set_logger(logger)
         # set board numbering mode
         settings.set_board_numbering_mode(mode)
         self.mode = mode
         self.set_valve_pin_number(valve_pin_number)
         self.__valve_setup()
 
+    def set_logger(self, logger):
+        """
+        :param logger: `logging.Logger` object used for logging actions of the object
+        """
+        assert(isinstance(logger, logging.Logger))
+        self.logger = logger
+
     def set_valve_pin_number(self, valve_pin_number):
+        """
+        :param valve_pin_number: integer representing the GPIO pin number that the valve is connected to
+        """
         assert(validate.is_valid_GPIO_pin_number(valve_pin_number, self.mode))
         self.valve_pin_number = valve_pin_number
         self.logger.info("valve: valve GPIO number set to {} {}".format(self.valve_pin_number, self.mode))
 
     def __valve_setup(self):
+        """
+        Sets the specified GPIO pin as an output pin.
+        """
         GPIO.setup(self.valve_pin_number, GPIO.OUT)
         self.valve_open = False
 
