@@ -3,7 +3,8 @@
 This application is a software tool for operating airsampler that takes air samples according to the specified schedule. 
 
 ## Understanding how airsampler works
-
+Refer to the diagram below to understand how the airsampler works.
+![Algorithm](/img/algorithm_diagram.png)
 
 ## Schedule file format
 Schedule file contains information necessary to take the air samples.
