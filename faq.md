@@ -4,6 +4,7 @@
 
 ### Where can I find a specific log file?
 All log files are saved in ```/home/pi/Desktop/sampler_logs/``` folder. 
+
 A new log file is generated every time the program is run (that is every time you turn on the Pi) and its name is the time the program started. For example, if the program started at 2:30 pm on March 26 2020, the name of the log file is ```2020-03-26 14:30:00```.
 
 ### What do log files log?
@@ -28,6 +29,7 @@ No. You are only allowed to insert one USB drive that contains the configuration
 
 ### I inserted a USB with files in an incorrect format to the Pi, ejected it, corrected the files and inserted the USB to the Pi again with the files in the correct format. It is not working. What's wrong?
 After you inserted a USB with files in an incorrect format, the program threw an exception and turned the Pi off. Therefore, the Pi was no longer running when you inserted the USB with files in the correct format to the Pi.
+
 To execute the schedule, turn the Pi on to start the program again and insert the USB.
 
 ### Can you SSH into the Pi and change the schedules on the USB drive without ejecting it?
@@ -72,6 +74,7 @@ If the schedule contains only samples that were supposed to be taken in the past
 
 ### I inserted/reinserted a USB with a schedule to the Pi late. Some samples were already supposed to be taken and some samples should be in progress right now. What is going to happen?
 All samples that are supposed to be in progress right now won't be taken. For example, sample starting at 11:30:00 and ending at 11:32:00 will not be taken if the USB drive is inserted to the Pi (or the Pi itself is turned on) at 11:31:00. Also, note that the configuration file specifies the number of seconds the pump starts pumping before the valve opens. If it the pump was already supposed to be pumping when you turned on the Pi/inserted the USB drive, the sample will not be taken. For example, let's say that a sample starts at 11:30:00 and ends at 11:32:00. If you set the number of seconds the pump starts pumping before the valve opens to 15 and now it is 11:29:55, this sample will not be taken because the pump was supposed to start pumping at 11:29:45.
+
 If the schedule contains only some samples that that are supposed to be in progress right now/were already supposed to be taken, the program will execute the future samples.
 
 
@@ -88,6 +91,7 @@ There wasn't any problem. The diode lights up only for the number of seconds spe
 There are several possibilities:
 
 - The schedule and configuration files 
+
         - aren't in the required format
         - are missing
         - don't have the corrent name
