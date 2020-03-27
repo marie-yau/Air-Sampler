@@ -1,7 +1,7 @@
 # Hardware setup
 
 ## Create circuit for the sampler
-![Circuit diagram for the sampler](/setup/img/final_setup_schematic.jpg)
+![Circuit diagram for the sampler](/img/final_setup_schematic.jpg)
 
 ## Set up Raspberry Pi
 ### Using monitor and keyboard
@@ -47,7 +47,7 @@ If you have real time clock DS3231 Model B (the one with 6 pins), you can't moun
 * SCL connects to pin 5
 
 
-![RTC circuit](/setup/img/setup_RTC.jpg)
+![RTC circuit](/img/setup_RTC.png)
 
 ### Configuring the real-time clock
 
