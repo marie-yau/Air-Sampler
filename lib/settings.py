@@ -37,4 +37,5 @@ def turn_Pi_off():
     """
     Turns Raspberry Pi off.
     """
+    logging.info("settings.py: turned off Pi")
     call("poweroff now", shell=True)
