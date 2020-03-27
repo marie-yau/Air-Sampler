@@ -25,6 +25,7 @@ def log_uncaught_exception(exception_type, exception_object, traceback):
                                                                                               exception_object))
     # set all GPIOs to output and turn them off
     settings.reset_gpio_pins()
+    settings.turn_Pi_off()
 
 
 if __name__ == "__main__":

@@ -1,10 +1,11 @@
 # library for board and Broadcom numbering modes
 import RPi.GPIO as GPIO
 import logging
+from subprocess import call
 
 def set_board_numbering_mode(mode):
     """
-    Set board numbering mode to either "BCM" (the GPIO is identified by the number that is used by Broadcom, the
+    Sets board numbering mode to either "BCM" (the GPIO is identified by the number that is used by Broadcom, the
     manufacturer) or "BOARD" (the GPIO is identified by the position on the Pi).
     :param mode: string representing a board numbering mode. Must be either "BCM" or "BOARD".
     """
@@ -31,3 +32,9 @@ def reset_gpio_pins():
         GPIO.setup(pin_number, GPIO.OUT)
         GPIO.output(pin_number, 0)
     logging.info("settings.py: set all GPIOs as outputs and set the outputs to False")
+
+def turn_Pi_off():
+    """
+    Turns Raspberry Pi off.
+    """
+    call("poweroff now", shell=True)

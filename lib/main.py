@@ -85,7 +85,7 @@ while True:
         except StopIteration:
             logger.error("main.py: no current pump or valve events to execute, exiting the program")
             reset_gpio_pins()
-            sys.exit()
+            turn_Pi_off()
         break
     time.sleep(1)
 
@@ -108,7 +108,7 @@ while True:
         except StopIteration:
             logger.error("main.py: no current pump or valve events to execute, exiting the program")
             reset_gpio_pins()
-            sys.exit()
+            turn_Pi_off()
         break
         diode_light_thread = threading.Thread(target=diode.turn_diode_on, args=(diode.get_diode_time_on_in_seconds(),))
         diode_light_thread.start()
@@ -138,7 +138,7 @@ while True:
     if valve_schedule_finished and pump_schedule_finished:
         reset_gpio_pins()
         logger.info("main.py: program finished executing the schedule")
-        sys.exit()
+        turn_Pi_off()
     # run the while loop once a second
     time.sleep(1)
     
