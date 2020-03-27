@@ -92,10 +92,10 @@ There are several possibilities:
 
 - The schedule and configuration files 
 
-        - aren't in the required format
-        - are missing
-        - don't have the corrent name
-        - aren't stored in the root location in the USB.
+   - aren't in the required format
+   - are missing
+   - don't have the corrent name
+   - aren't stored in the root location in the USB.
         
 - More than one USB is inserted in the Pi.
 - Pi wasn't turned on (the green and red lights on the motherboard didn't light up/blink).
