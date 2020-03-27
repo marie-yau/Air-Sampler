@@ -71,6 +71,7 @@ path_to_ID_number_file = "/home/pi/.ID.txt"
 with open(path_to_ID_number_file, "r") as file:
     content = file.read()
 ID_number = int(content)
+logger.info("main.py: set ID number of sampler to {}".format(str(ID_number)))
 
 # wait for USB to be inserted
 usb = USB_drive(logger)
