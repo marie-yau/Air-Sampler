@@ -7,8 +7,8 @@ All log files are saved in ```/home/pi/Desktop/sampler_logs/``` folder.
 
 A new log file is generated every time the program is run (that is every time you turn on the Pi) and its name is the time the program started. For example, if the program started at 2:30 pm on March 26 2020, the name of the log file is ```2020-03-26 14:30:00```.
 
-### What do log files log?
-The log files log:
+### What does the program log?
+The program logs:
 
 - actions of pump, valves and diode
 - content of configuration file
