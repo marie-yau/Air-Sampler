@@ -10,7 +10,7 @@ The GPS module used was E218213 by adafruit.
 * TX connects to pin 10
 
 
-![Circuit diagram for the sampler](/setup/img/setup_GPS.jpg)
+![Circuit diagram for the sampler](/img/setup_GPS.png)
 ## Configuration
 1. Connect Raspberry Pi to Wi-Fi.
 2. Enable serial interface.
