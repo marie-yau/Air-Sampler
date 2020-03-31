@@ -1,6 +1,11 @@
-# library for board and Broadcom numbering modes
+"""
+Package containing methods for setting Pi and its GPIOs.
+"""
+
 import RPi.GPIO as GPIO
 import logging
+import validate
+
 from subprocess import call
 
 def set_board_numbering_mode(mode):
@@ -31,7 +36,19 @@ def reset_gpio_pins():
     for pin_number in range(0, 28):
         GPIO.setup(pin_number, GPIO.OUT)
         GPIO.output(pin_number, 0)
-    logging.info("settings.py: set all GPIOs as outputs and set the outputs to False")
+    logging.info("settings.py: set all GPIOs as output pin and set the outputs to False")
+
+
+def reset_gpio_pin(pin_number, mode):
+    """
+    Sets specified GPIO pin as output and sets the outputs to False.
+    :param pin_number: integer representing a valid GPIO pin number
+    :param mode: string representing Pi's numbering mode, must be "BCM" or "BOARD"
+    """
+    assert(validate.is_valid_GPIO_pin_number(pin_number, mode))
+    GPIO.setup(pin_number, GPIO.OUT)
+    GPIO.output(pin_number, 0)
+    logging.info("settings.py: set GPIO {} as output pin and set the output to False".format(pin_number))
 
 def turn_Pi_off():
     """
