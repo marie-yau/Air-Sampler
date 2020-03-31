@@ -56,7 +56,8 @@ The sampler ID number is in ```/home/pi/.ID.txt``` file. Type ```nano /home/pi/.
 ### When will Pi turn itself off?
 The Pi turns itself off when the program finishes the schedule or when the program throws an exception or error (e.g. because the files in are in incorrect format or are missing).
 
-
+### How do I know that Pi is turned off?
+When Pi is turned off, the red light on the motherboard is on and the green light is off.
 
 ## Schedule and configuration files
 
