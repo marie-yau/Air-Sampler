@@ -29,7 +29,7 @@ def update_schedules_and_configuration(usb, ID, logger):
     file_name = str(ID) + "_errors.txt"
     file_path = join(usb.get_path_to_usb(), file_name)
     user_logger = logging.getLogger("user logger")
-    user_file_handler = logging.FileHandler(file_path)
+    user_file_handler = logging.FileHandler(file_path, mode = "w")
     user_logger.addHandler(user_file_handler)
     
     try:
