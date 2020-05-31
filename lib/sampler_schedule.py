@@ -112,7 +112,8 @@ class SamplerSchedule():
                         bag_event = self.convert_line_to_bag_event(line)
                         self.complete_bag_schedule.append(bag_event)
                     except:
-                        error_messages.append("Line {}: Invalid line (`{}`).")
+                        error_messages.append("Line {}: Invalid line (`{}`)."
+                                              .format(line_number, line))
         except:
             error_messages.append("Schedule file is missing. "
                                   "Create a valid schedule file `{}` on the USB drive. "
@@ -124,8 +125,8 @@ class SamplerSchedule():
         for i in range(0, len(self.complete_bag_schedule) - 1):
             if self.complete_bag_schedule[i].get_bag_time_off() > self.complete_bag_schedule[i + 1].get_bag_time_on():
                 error_messages.append("Samples in schedule can't overlap. Samples `{}` and `{}` overlap."
-                                      .format(self.complete_bag_schedule[i].get_bag_event(),
-                                              self.complete_bag_schedule[i + 1].get_bag_event()))
+                                      .format(self.complete_bag_schedule[i].get_bag_event_as_string(),
+                                              self.complete_bag_schedule[i + 1].get_bag_event_as_string()))
         # write error messages to log files
         if error_messages:
             user_logger.info("-------------")

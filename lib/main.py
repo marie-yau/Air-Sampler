@@ -29,10 +29,9 @@ def update_schedules_and_configuration(usb, ID, logger):
     file_name = str(ID) + "_errors.txt"
     file_path = join(usb.get_path_to_usb(), file_name)
     user_logger = logging.getLogger("user logger")
-    user_logger.basicConfig(filename=file_path,
-                            format="%(asctime)s %(message)s",
-                            filemode="w",
-                            level=logging.DEBUG)
+    user_file_handler = logging.FileHandler(file_path)
+    user_logger.addHandler(user_file_handler)
+    
     try:
         # read configuration for sampler from the configuration file
         configuration = Configuration(path_to_configuration_file, logger, user_logger)
@@ -74,10 +73,12 @@ def update_schedules_and_configuration(usb, ID, logger):
 current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 file_path = "/home/pi/Desktop/sampler_logs/" + current_time + ".log"
 logger = logging.getLogger("main logger")
-logger.basicConfig(filename=file_path,
-                    format="%(asctime)s %(message)s",
+logging.basicConfig(format="%(asctime)s %(message)s",
                     filemode="w",
                     level=logging.DEBUG)
+file_handler = logging.FileHandler(file_path)
+logger.addHandler(file_handler)
+
 logger.info("main.py: program started")
 
 disable_gpio_warnings()

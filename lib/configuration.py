@@ -66,16 +66,6 @@ class Configuration():
                                   "Create a valid configuration file `{}` on the USB drive. "
                                   .format(self.file_path.split("/")[-1]))
 
-        headers = [#"Numbering mode",
-                   #"Bag numbers to valve pin numbers",
-                   #"Pump pin number",
-                   #"Diode pin number",
-                   #"Diode light duration",
-                   "Number of seconds pump starts pumping before valve opens",
-                   "Number of seconds pump continues pumping after valve closes",
-                   "Pump time off tolerance in seconds"]
-        if lines[0::2] != headers:
-            error_messages("Headers d")
         # numbering mode section
         try:
             if lines[0] != "Numbering mode":
