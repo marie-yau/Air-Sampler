@@ -117,6 +117,15 @@ class SamplerSchedule():
             error_messages.append("Schedule file is missing. "
                                   "Create a valid schedule file `{}` on the USB drive. "
                                   .format(self.file_path.split("/")[-1]))
+
+        # sort `self.complete_bag_schedule` by `time_on` in increasing order
+        self.complete_bag_schedule.sort(key=lambda event: event.get_bag_time_on())
+        # check schedule for overlaps
+        for i in range(0, len(self.complete_bag_schedule) - 1):
+            if self.complete_bag_schedule[i].get_bag_time_off() > self.complete_bag_schedule[i + 1].get_bag_time_on():
+                error_messages.append("Samples in schedule can't overlap. Samples `{}` and `{}` overlap."
+                                      .format(self.complete_bag_schedule[i].get_bag_event(),
+                                              self.complete_bag_schedule[i + 1].get_bag_event()))
         # write error messages to log files
         if error_messages:
             user_logger.info("-------------")
@@ -137,8 +146,6 @@ class SamplerSchedule():
 
             raise ValueError("Schedule file is missing or is in an invalid format.")
 
-        # sort `self.complete_bag_schedule` by `time_on` in increasing order
-        self.complete_bag_schedule.sort(key=lambda event: event.get_bag_time_on())
         self.logger.info("sampler_schedule.py: read bag schedule from file {}: {}"
                          .format(self.file_path,
                                  [[bag_event.get_bag_number(),
