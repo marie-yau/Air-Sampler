@@ -4,6 +4,7 @@ import logging
 import sys
 import threading
 import sys
+from os.path import join
 
 from sampler_schedule import *
 from sampler import *
@@ -24,15 +25,34 @@ def update_schedules_and_configuration(usb, ID, logger):
     """
     path_to_schedule_file = usb.get_path_for_schedule_file(ID)
     path_to_configuration_file = usb.get_path_for_configuration_file(ID)
-    # read configuration for sampler from the configuration file
-    configuration = Configuration(path_to_configuration_file,
-                                  logger)
-    # generate valve and pump schedules for sampler based on the schedule file
-    schedules_for_sampler = SamplerSchedule(path_to_schedule_file,
-                                            configuration.get_pump_starts_before(),
-                                            configuration.get_pump_stops_after(),
-                                            configuration.get_pump_time_off_tolerance(),
-                                            logger)
+
+    file_name = str(ID) + "_errors.txt"
+    file_path = join(usb.get_path_to_usb(), file_name)
+    user_logger = logging.getLogger("user logger")
+    user_logger.basicConfig(filename=file_path,
+                            format="%(asctime)s %(message)s",
+                            filemode="w",
+                            level=logging.DEBUG)
+    try:
+        # read configuration for sampler from the configuration file
+        configuration = Configuration(path_to_configuration_file, logger, user_logger)
+    except:
+        try:
+            schedule = SamplerSchedule(path_to_schedule_file, 0, 0, 0, logger, user_logger)
+            raise ValueError("Invalid configuration file.")
+        except:
+            raise ValueError("Invalid configuration file and schedule file.")
+    try:
+        # generate valve and pump schedules for sampler based on the schedule file
+        schedules_for_sampler = SamplerSchedule(path_to_schedule_file,
+                                                configuration.get_pump_starts_before(),
+                                                configuration.get_pump_stops_after(),
+                                                configuration.get_pump_time_off_tolerance(),
+                                                logger,
+                                                user_logger)
+    except:
+        raise ValueError("Invalid schedule file.")
+
     # apply configuration to `Sampler` and `Diode` objects
     sampler = Sampler(configuration.get_pump_pin_number(),
                       configuration.get_bag_numbers_to_valve_pin_numbers_dict(),
@@ -53,11 +73,11 @@ def update_schedules_and_configuration(usb, ID, logger):
 # create logger object for logging events and errors
 current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 file_path = "/home/pi/Desktop/sampler_logs/" + current_time + ".log"
-logging.basicConfig(filename=file_path,
+logger = logging.getLogger("main logger")
+logger.basicConfig(filename=file_path,
                     format="%(asctime)s %(message)s",
                     filemode="w",
                     level=logging.DEBUG)
-logger = logging.getLogger()
 logger.info("main.py: program started")
 
 disable_gpio_warnings()

@@ -27,7 +27,7 @@ class SamplerSchedule():
     ---------------------------------------------
     """
 
-    def __init__(self, file_path, pump_start_before, pump_end_after, pump_tolerance, logger):
+    def __init__(self, file_path, pump_start_before, pump_end_after, pump_tolerance, logger, user_logger):
         """
         :param file_path: string representing the path to the schedule file
         :param pump_start_before: `timedelta` object representing the number of seconds that the pump starts pumping
@@ -37,13 +37,15 @@ class SamplerSchedule():
         :param pump_tolerance: `timedelta` object representing the number of seconds. If pump is supposed to turn off
         for less than specified number of seconds, it will continue pumping.
         :param logger: `logging.Logger` object used for logging actions of the object
+        :param user_logger: `logging.Logger` object used for logging invalid format of schedule file
+        in a user-friendly way
         """
         self.set_logger(logger)
         self.set_pump_timedelta_before_valve(pump_start_before)
         self.set_pump_timedelta_after_valve(pump_end_after)
         self.set_pump_off_time_tolerance(pump_tolerance)
         self.file_path = file_path
-        self._read_bag_schedule()
+        self._read_bag_schedule(user_logger)
         self._create_valve_schedule(self.complete_bag_schedule)
         self._create_pump_schedule(self.complete_bag_schedule)
 
@@ -81,21 +83,60 @@ class SamplerSchedule():
         self.pump_off_time_tolerance = pump_tolerance
         self.logger.info("sampler_schedule.py: set pump time off tolerance to {}".format(self.pump_off_time_tolerance))
         
-    def _read_bag_schedule(self):
+    def _read_bag_schedule(self, user_logger):
         """
         Reads bag schedule from file and creates a list of `BagEvent` objects based on the schedule.
+        :param user_logger: `logging.Logger` object used for logging invalid format of schedule file
+        in a user-friendly way
         """
+        assert (isinstance(user_logger, logging.Logger))
         self.complete_bag_schedule = []
-        with open(self.file_path) as file:
-            # skip header line of file and check its format
-            header_line = next(file)
-            assert(header_line == "Bag number, Start filling, Stop filling\n")
-            for line in file:
-                # if first character of `line` is `#`, the whole line is considered to be a comment and is skipped
-                if line[0] == "#":
-                    continue
-                bag_event = self.convert_line_to_bag_event(line)
-                self.complete_bag_schedule.append(bag_event)
+        error_messages = []
+        try:
+            with open(self.file_path) as file:
+                # skip header line of file and check its format
+                header_line = next(file)
+                try:
+                    assert(header_line == "Bag number, Start filling, Stop filling\n")
+                except:
+                    error_messages.append("Line 1: Invalid header. "
+                                          "Replace `{}` with `Bag number, Start filling, Stop filling`"
+                                          .format(header_line))
+                for line_number, line in enumerate(file, 2):
+                    # if first character of `line` is `#`, the whole line is considered to be a comment and is skipped
+                    if line[0] == "#":
+                        continue
+                    elif line[0].strip() == "":
+                        continue
+                    try:
+                        bag_event = self.convert_line_to_bag_event(line)
+                        self.complete_bag_schedule.append(bag_event)
+                    except:
+                        error_messages.append("Line {}: Invalid line (`{}`).")
+        except:
+            error_messages.append("Schedule file is missing. "
+                                  "Create a valid schedule file `{}` on the USB drive. "
+                                  .format(self.file_path.split("/")[-1]))
+        # write error messages to log files
+        if error_messages:
+            user_logger.info("-------------")
+            self.logger.info("-------------")
+            user_logger.info("Schedule file")
+            self.logger.info("Schedule file")
+            for msg in error_messages:
+                self.logger.info(msg)
+                user_logger.info(msg)
+            user_logger.info("\nTo fix `Invalid line` error, check:\n"
+                             "- if the line is in the format `<bag number>, <start time>, <stop time>` "
+                             "(e.g. `3, 2020-03-06 11:39:15, 2020-03-06 11:39:35`"
+                             "- if the bag number is valid (it must be positive integer from interval [1,13])"
+                             "- if the times are valid (they must be `YYYY-MM-DD hh:mm:ss` format)"
+                             "- if the start time is earlier than stop time")
+            user_logger.info("-------------")
+            self.logger.info("-------------")
+
+            raise ValueError("Schedule file is missing or is in an invalid format.")
+
         # sort `self.complete_bag_schedule` by `time_on` in increasing order
         self.complete_bag_schedule.sort(key=lambda event: event.get_bag_time_on())
         self.logger.info("sampler_schedule.py: read bag schedule from file {}: {}"

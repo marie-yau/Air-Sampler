@@ -36,42 +36,125 @@ class Configuration():
                  "pump_starts_before", "pump_stops_after", "pump_time_off_tolerance", "logger",
                  "diode_light_duration"]
 
-    def __init__(self, file_path, logger):
+    def __init__(self, file_path, logger, user_logger):
         """
         :param file_path: string representing a path to the configuration file
         :param logger: `logging.Logger` object used for logging actions of `Configuration` object
+        :param user_logger: `logging.Logger` object used for logging invalid format of configuration file
+        in a user-friendly way
         """
         self.set_logger(logger)
-        self._read_configuration_file(file_path)
+        self._read_configuration_file(file_path, user_logger)
 
-    def _read_configuration_file(self, file_path):
+    def _read_configuration_file(self, file_path, user_logger):
         """
         Reads configuration file line by line and sets class attributes using their setter methods.
         :param file_path: string representing a path to the configuration file
+        :param user_logger: `logging.Logger` object used for logging invalid format of configuration file
+        in a user-friendly way
         """
+        assert (isinstance(user_logger, logging.Logger))
+        error_messages = []
+
         # read lines of into a list and remove any leading and trailing white spaces
-        with open(file_path, "r") as config_file:
-            lines = [line.strip() for line in config_file]
-        lines_iterator = iter(lines)
-        for line in lines_iterator:
-            if line == "Numbering mode":
-                self.set_numbering_mode(next(lines_iterator))
-            elif line == "Bag numbers to valve pin numbers":
-                self.set_bag_numbers_to_valve_pin_numbers_dict(next(lines_iterator))
-            elif line == "Pump pin number":
-                self.set_pump_pin_number(next(lines_iterator))
-            elif line == "Diode pin number":
-                self.set_diode_pin_number(next(lines_iterator))
-            elif line == "Diode light duration":
-                self.set_diode_light_duration(next(lines_iterator))
-            elif line == "Number of seconds pump starts pumping before valve opens":
-                self.set_pump_starts_before(next(lines_iterator))
-            elif line == "Number of seconds pump continues pumping after valve closes":
-                self.set_pump_stops_after(next(lines_iterator))
-            elif line == "Pump time off tolerance in seconds":
-                self.set_pump_time_off_tolerance(next(lines_iterator))
-            else:
-                raise ValueError("invalid header line format in the configuration file")
+        lines = []
+        try:
+            with open(file_path, "r") as config_file:
+                lines = [line.strip() for line in config_file]
+        except:
+            error_messages.append("Configuration file is missing. "
+                                  "Create a valid configuration file `{}` on the USB drive. "
+                                  .format(self.file_path.split("/")[-1]))
+
+        headers = [#"Numbering mode",
+                   #"Bag numbers to valve pin numbers",
+                   #"Pump pin number",
+                   #"Diode pin number",
+                   #"Diode light duration",
+                   "Number of seconds pump starts pumping before valve opens",
+                   "Number of seconds pump continues pumping after valve closes",
+                   "Pump time off tolerance in seconds"]
+        if lines[0::2] != headers:
+            error_messages("Headers d")
+        # numbering mode section
+        try:
+            if lines[0] != "Numbering mode":
+                error_messages.append("Line 1: Header is invalid. Replace it with `Numbering mode`.")
+            self.set_numbering_mode(lines[1])
+        except:
+            error_messages.append("Line 2: The numbering mode is invalid. It must be `BCM` or `BOARD`.")
+        # bag numbers to valve pin numbers
+        try:
+            if lines[2] != "Bag numbers to valve pin numbers":
+                error_messages.append("Line 3: Header is invalid. Replace it with `Bag numbers to valve pin numbers`.")
+            self.set_bag_numbers_to_valve_pin_numbers_dict(lines[3])
+        except:
+            error_messages.append("Line 4: Bag numbers to valve pin numbers is invalid. It must be in format "
+                           "<bag number 1> : <GPIO number 1>, ..., <bag number n> : <GPIO number n>. "
+                           "For example, 1: 19, 2: 4, 3: 22.")
+        # pump pin number section
+        try:
+            if lines[4] != "Pump pin number":
+                error_messages.append("Line 5: Header is invalid. Replace it with `Pump pin number`.")
+            self.set_pump_pin_number(lines[5])
+        except:
+            error_messages.append("Line 6: Pump pin number is invalid. It must be a valid GPIO number in the specified numbering mode.")
+        # diode pin number section
+        try:
+            if lines[6] != "Diode pin number":
+                error_messages.append("Line 7: Header is invalid. Replace it with `Diode pin number`.")
+            self.set_diode_pin_number(lines[7])
+        except:
+            error_messages("Line 8: Diode pin number is invalid. It must be a valid GPIO number in the specified numbering mode.")
+        # diode light duration section
+        try:
+            if lines[8] != "Diode light duration":
+                error_messages.append("Line 9: Header is invalid. Replace it with `Diode light duration`.")
+            self.set_diode_light_duration(lines[9])
+        except:
+            error_messages("Line 10: Diode light duration is invalid. It must be a positive integer.")
+        # number of seconds pump starts pumping before valve opens section
+        try:
+            if lines[10] != "Number of seconds pump starts pumping before valve opens":
+                error_messages.append("Line 11: Header is invalid. Replace it with `Number of seconds pump starts pumping before valve opens`.")
+            self.set_pump_starts_before(lines[11])
+        except:
+            error_messages.append("Line 12: Number of seconds that pump starts before valve opens is invalid. "
+                           "It must be a non-negative integer.")
+        # number of seconds pump continues pumping after valve closes section
+        try:
+            if lines[12] != "Number of seconds pump continues pumping after valve closes":
+                error_messages.append("Line 13: Header is invalid. Replace it with `Number of seconds pump continues pumping after valve closes`.")
+            self.set_pump_stops_after(lines[13])
+        except:
+            error_messages.append("Line 14: Number of seconds pump continues pumping after valve closes is invalid. "
+                                  "It must be a non-negative integer.")
+        # pump time off tolerance in seconds
+        try:
+            if lines[14] != "Pump time off tolerance in seconds":
+                error_messages.append("Line 15: Header is invalid. Replace it with `Pump time off tolerance in seconds`.")
+            self.set_pump_time_off_tolerance(lines[15])
+        except:
+            error_messages.append("Line 16: Pump time off tolerance in seconds is invalid. "
+                                  "It must be a non-negative integer.")
+        # check if file contains more lines
+        if len(lines) > 16:
+            for i in range (16, len(lines)):
+                if lines[i].strip() != "":
+                    error_messages.append("Line {}: Configuration file can't contain any additional lines. Delete this line."
+                                          .format(i+1))
+        # write error messages to log files
+        if error_messages:
+            user_logger.info("-------------")
+            self.logger.info("-------------")
+            user_logger.info("Configuration file")
+            self.logger.info("Configuration file")
+            for msg in error_messages:
+                self.logger.info(msg)
+                user_logger.info(msg)
+            user_logger.info("-------------")
+            self.logger.info("-------------")
+            raise ValueError("Configuration file is missing or is in an invalid format.")
 
     def set_logger(self, logger):
         """
@@ -128,6 +211,7 @@ class Configuration():
         """
         :param time: string representing the number of seconds that diode stays turned on
         """
+        assert(int(time) > 0)
         self.diode_light_duration = timedelta(seconds=int(time))
         self.logger.info("Configuration.py: set diode light duration to {}".format(self.diode_light_duration))
 
