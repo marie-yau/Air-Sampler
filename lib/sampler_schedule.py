@@ -58,7 +58,7 @@ class SamplerSchedule():
         self.logger = logger
 
     def set_user_logger(self, user_logger):
-        assert (isinstance(logger, logging.Logger))
+        assert (isinstance(user_logger, logging.Logger))
         self.user_logger = user_logger
 
     def set_pump_timedelta_before_valve(self, pump_start_before):
@@ -94,7 +94,6 @@ class SamplerSchedule():
         :param user_logger: `logging.Logger` object used for logging invalid format of schedule file
         in a user-friendly way
         """
-        assert (isinstance(user_logger, logging.Logger))
         self.complete_bag_schedule = []
         error_messages = []
         try:

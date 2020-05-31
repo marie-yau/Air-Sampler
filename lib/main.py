@@ -37,7 +37,12 @@ def update_schedules_and_configuration(usb, ID, logger):
         configuration = Configuration(path_to_configuration_file, logger, user_logger)
     except:
         try:
-            schedule = SamplerSchedule(path_to_schedule_file, 0, 0, 0, logger, user_logger)
+            schedule = SamplerSchedule(path_to_schedule_file,
+                                       timedelta(seconds=1),
+                                       timedelta(seconds=1),
+                                       timedelta(seconds=1),
+                                       logger,
+                                       user_logger)
             raise ValueError("Invalid configuration file.")
         except:
             raise ValueError("Invalid configuration file and schedule file.")

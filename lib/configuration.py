@@ -45,7 +45,7 @@ class Configuration():
         """
         self.set_logger(logger)
         self.set_user_logger(user_logger)
-        self._read_configuration_file(file_path, user_logger)
+        self._read_configuration_file(file_path)
 
     def _read_configuration_file(self, file_path):
         """
@@ -54,7 +54,6 @@ class Configuration():
         :param user_logger: `logging.Logger` object used for logging invalid format of configuration file
         in a user-friendly way
         """
-        assert (isinstance(user_logger, logging.Logger))
         error_messages = []
 
         # read lines of into a list and remove any leading and trailing white spaces
@@ -155,7 +154,7 @@ class Configuration():
         self.logger = logger
 
     def set_user_logger(self, user_logger):
-        assert (isinstance(logger, logging.Logger))
+        assert (isinstance(user_logger, logging.Logger))
         self.user_logger = user_logger
 
     def set_numbering_mode(self, mode):
