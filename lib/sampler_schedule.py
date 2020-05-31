@@ -164,8 +164,6 @@ class SamplerSchedule():
         :param bag_schedule: list of `BagEvent` objects
         :return: list of `ValveEvent objects`
         """
-        # `bag_schedule` list can't be empty
-        assert (len(bag_schedule) > 0)
         valve_schedule = []
         for bag_event in bag_schedule:
             valve_schedule.append(ValveEvent(bag_event.get_bag_time_on(), bag_event.get_bag_number(),  "open valve"))
@@ -180,9 +178,9 @@ class SamplerSchedule():
         :param bag_schedule: list of `BagEvent` objects
         :return: list of `PumpEvent` objects
         """
-        # `bag_schedule` list can't be empty
-        assert(len(bag_schedule) > 0)
         pump_schedule = []
+        if not bag_schedule:
+            return pump_schedule
         # create a list of time intervals when the pump is on, the intervals are in format [time_pump_on, time_pump_off]
         unmerged_pump_on_intervals = [[bag_event.get_bag_time_on() - self.pump_timedelta_before_valve, bag_event.get_bag_time_off()
                                        + self.pump_timedelta_after_valve] for bag_event in bag_schedule]

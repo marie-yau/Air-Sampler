@@ -70,8 +70,16 @@ def update_schedules_and_configuration(usb, ID, logger):
     current_time = datetime.now()
     # create iterator over lists of `valve_event` objects and `pump_event` objects
     # note that lists include only future events, not past events
-    valves_schedule = iter(schedules_for_sampler.get_current_valve_schedule(current_time))
-    pump_schedule = iter(schedules_for_sampler.get_current_pump_schedule(current_time))
+    
+    list_of_valve_events = schedules_for_sampler.get_current_valve_schedule(current_time)
+    list_of_pump_events = schedules_for_sampler.get_current_pump_schedule(current_time)
+    if not list_of_valve_events and not list_of_pump_events:
+        user_logger.info("There are no samples that are scheduled to be taken in the future. "
+                         "That may be because the schedule file is empty or because the samples "
+                         "were all scheduled to be taken in the past.")
+        raise ValueError("There are no samples that are scheduled to be taken in the future.")
+    valves_schedule = iter(list_of_valve_events)
+    pump_schedule = iter(list_of_pump_events)
     return valves_schedule, pump_schedule, sampler, diode
 
 # create logger object for logging events and errors
