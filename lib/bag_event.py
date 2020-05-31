@@ -84,6 +84,9 @@ class BagEvent():
         """
         return self.bag_number, self.bag_time_on, self.bag_time_off
     
+    def get_bag_event_as_string(self):
+        return str(self.bag_number) + ", " + self.bag_time_on.strftime("%Y-%m-%d %H:%M:%S") + ", " + self.bag_time_off.strftime("%Y-%m-%d %H:%M:%S") 
+    
     def print_bag_event(self):
         """
         Print information contained in the `BagEvent` object.
@@ -97,9 +100,9 @@ class BagEvent():
         :return: true if `number` is a valid bag number, otherwise false
         """
         if isinstance(number, int) and number > 0 and number < 14:
-            return true
+            return True
         else:
-            return false
+            return False
 
 if __name__ == "__main__":
     bag_number = 5
