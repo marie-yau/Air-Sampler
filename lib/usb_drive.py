@@ -86,6 +86,14 @@ class USB_drive():
         assert(isfile(path_to_schedule_file))
         return path_to_schedule_file
 
+    def get_path_to_usb(self):
+        """
+        Creates path to the USB drive
+        :return: string representing the path to the USB drive
+        """
+        assert(self.is_inserted())
+        return join(self.path, self.usb_name)
+
 if __name__ == "__main__":
     my_usb = USB_drive()
     print("USB is inserted: ", my_usb.is_inserted())
