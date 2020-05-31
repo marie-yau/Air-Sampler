@@ -33,7 +33,7 @@ class Configuration():
     -----------------
     """
     __slots__ = ["bag_numbers_to_valve_pin_numbers_dict", "pump_pin_number", "diode_pin_number", "numbering_mode",
-                 "pump_starts_before", "pump_stops_after", "pump_time_off_tolerance", "logger",
+                 "pump_starts_before", "pump_stops_after", "pump_time_off_tolerance", "logger", "user_logger",
                  "diode_light_duration"]
 
     def __init__(self, file_path, logger, user_logger):
@@ -44,9 +44,10 @@ class Configuration():
         in a user-friendly way
         """
         self.set_logger(logger)
+        self.set_user_logger(user_logger)
         self._read_configuration_file(file_path, user_logger)
 
-    def _read_configuration_file(self, file_path, user_logger):
+    def _read_configuration_file(self, file_path):
         """
         Reads configuration file line by line and sets class attributes using their setter methods.
         :param file_path: string representing a path to the configuration file
@@ -135,14 +136,14 @@ class Configuration():
                                           .format(i+1))
         # write error messages to log files
         if error_messages:
-            user_logger.info("-------------")
+            self.user_logger.info("-------------")
             self.logger.info("-------------")
-            user_logger.info("Configuration file")
+            self.user_logger.info("Configuration file")
             self.logger.info("Configuration file")
             for msg in error_messages:
                 self.logger.info(msg)
-                user_logger.info(msg)
-            user_logger.info("-------------")
+                self.user_logger.info(msg)
+            self.user_logger.info("-------------")
             self.logger.info("-------------")
             raise ValueError("Configuration file is missing or is in an invalid format.")
 
@@ -152,6 +153,10 @@ class Configuration():
         """
         assert(isinstance(logger, logging.Logger))
         self.logger = logger
+
+    def set_user_logger(self, user_logger):
+        assert (isinstance(logger, logging.Logger))
+        self.user_logger = user_logger
 
     def set_numbering_mode(self, mode):
         """

@@ -41,11 +41,12 @@ class SamplerSchedule():
         in a user-friendly way
         """
         self.set_logger(logger)
+        self.set_user_logger(user_logger)
         self.set_pump_timedelta_before_valve(pump_start_before)
         self.set_pump_timedelta_after_valve(pump_end_after)
         self.set_pump_off_time_tolerance(pump_tolerance)
         self.file_path = file_path
-        self._read_bag_schedule(user_logger)
+        self._read_bag_schedule()
         self._create_valve_schedule(self.complete_bag_schedule)
         self._create_pump_schedule(self.complete_bag_schedule)
 
@@ -55,6 +56,10 @@ class SamplerSchedule():
         """
         assert(isinstance(logger, logging.Logger))
         self.logger = logger
+
+    def set_user_logger(self, user_logger):
+        assert (isinstance(logger, logging.Logger))
+        self.user_logger = user_logger
 
     def set_pump_timedelta_before_valve(self, pump_start_before):
         """
@@ -83,7 +88,7 @@ class SamplerSchedule():
         self.pump_off_time_tolerance = pump_tolerance
         self.logger.info("sampler_schedule.py: set pump time off tolerance to {}".format(self.pump_off_time_tolerance))
         
-    def _read_bag_schedule(self, user_logger):
+    def _read_bag_schedule(self):
         """
         Reads bag schedule from file and creates a list of `BagEvent` objects based on the schedule.
         :param user_logger: `logging.Logger` object used for logging invalid format of schedule file
@@ -129,20 +134,20 @@ class SamplerSchedule():
                                               self.complete_bag_schedule[i + 1].get_bag_event_as_string()))
         # write error messages to log files
         if error_messages:
-            user_logger.info("-------------")
+            self.user_logger.info("-------------")
             self.logger.info("-------------")
-            user_logger.info("Schedule file")
+            self.user_logger.info("Schedule file")
             self.logger.info("Schedule file")
             for msg in error_messages:
                 self.logger.info(msg)
-                user_logger.info(msg)
+                self.user_logger.info(msg)
             user_logger.info("\nTo fix `Invalid line` error, check:\n"
                              "- if the line is in the format `<bag number>, <start time>, <stop time>` "
                              "(e.g. `3, 2020-03-06 11:39:15, 2020-03-06 11:39:35`"
                              "- if the bag number is valid (it must be positive integer from interval [1,13])"
                              "- if the times are valid (they must be `YYYY-MM-DD hh:mm:ss` format)"
                              "- if the start time is earlier than stop time")
-            user_logger.info("-------------")
+            self.user_logger.info("-------------")
             self.logger.info("-------------")
 
             raise ValueError("Schedule file is missing or is in an invalid format.")
