@@ -142,10 +142,10 @@ class SamplerSchedule():
                 self.logger.info(msg)
                 self.user_logger.info(msg)
             user_logger.info("\nTo fix `Invalid line` error, check:\n"
-                             "- if the line is in the format `<bag number>, <start time>, <stop time>` "
-                             "(e.g. `3, 2020-03-06 11:39:15, 2020-03-06 11:39:35`"
-                             "- if the bag number is valid (it must be positive integer from interval [1,13])"
-                             "- if the times are valid (they must be `YYYY-MM-DD hh:mm:ss` format)"
+                             "- if the line is in the format `<bag number>, <start time>, <stop time>` \n"
+                             "(e.g. `3, 2020-03-06 11:39:15, 2020-03-06 11:39:35`\n"
+                             "- if the bag number is valid (it must be positive integer from interval [1,13])\n"
+                             "- if the times are valid (they must be `YYYY-MM-DD hh:mm:ss` format)\n"
                              "- if the start time is earlier than stop time")
             self.user_logger.info("-------------")
             self.logger.info("-------------")
