@@ -24,7 +24,7 @@ class BagEvent():
         """
         :param number: positive integer representing the bag number
         """
-        assert(isinstance(number, int) and number > 0)
+        assert(self.is_valid_bag_number(number))
         self.bag_number = number
 
     def set_bag_time_on(self, time_on):
@@ -90,6 +90,16 @@ class BagEvent():
         """
         print(self.bag_number, "\t", self.bag_time_on, "\t", self.bag_time_off)
 
+    @staticmethod
+    def is_valid_bag_number(number):
+        """
+        :param number: positive integer representing the bag number
+        :return: true if `number` is a valid bag number, otherwise false
+        """
+        if isinstance(number, int) and number > 0 and number < 14:
+            return true
+        else:
+            return false
 
 if __name__ == "__main__":
     bag_number = 5
