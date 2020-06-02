@@ -135,14 +135,12 @@ class Configuration():
                                           .format(i+1))
         # write error messages to log files
         if error_messages:
-            self.user_logger.info("-------------")
             self.logger.info("-------------")
-            self.user_logger.info("Configuration file")
+            self.user_logger.info("CONFIGURATION FILE")
             self.logger.info("Configuration file")
             for msg in error_messages:
                 self.logger.info(msg)
                 self.user_logger.info(msg)
-            self.user_logger.info("-------------")
             self.logger.info("-------------")
             raise ValueError("Configuration file is missing or is in an invalid format.")
 
@@ -214,6 +212,7 @@ class Configuration():
         :param number_of_seconds: string representing the number of seconds that the pump starts pumping before the
         valve opens
         """
+        assert(int(number_of_seconds) >= 0)
         self.pump_starts_before = timedelta(seconds=int(number_of_seconds))
         self.logger.info("configuration.py: set pump starts before valve opens to {}".format(self.pump_starts_before))
 
@@ -222,6 +221,7 @@ class Configuration():
         :param number_of_seconds: string representing the number of seconds that the pump keeps pumping after the
         valve closes
         """
+        assert(int(number_of_seconds) >= 0)
         self.pump_stops_after = timedelta(seconds=int(number_of_seconds))
         self.logger.info("configuration.py: set pump stops after valve closes to {}".format(self.pump_stops_after))
 
@@ -230,6 +230,7 @@ class Configuration():
         :param number_of_seconds: string representing the number of seconds. If pump is supposed to turn off for less
         than specified number of seconds, it will continue pumping
         """
+        assert(int(number_of_seconds) >= 0)
         self.pump_time_off_tolerance = timedelta(seconds=int(number_of_seconds))
         self.logger.info("configuration.py: set pump time off tolerance to {}".format(self.pump_time_off_tolerance))
 
