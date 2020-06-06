@@ -145,6 +145,7 @@ class HardwareConfiguration():
         """
         assert (int(id) > 0)
         self.identification_number = int(id)
+        self.logger.info("hardware_configuration.py: set identification number to {}".format(self.identification_number))
 
     def __set_numbering_mode(self, mode):
         """
@@ -152,7 +153,7 @@ class HardwareConfiguration():
         """
         assert (mode == "BCM" or mode == "BOARD")
         self.numbering_mode = mode
-        self.logger.info("configuration.py: set numbering mode to {}".format(self.numbering_mode))
+        self.logger.info("hardware_configuration.py: set numbering mode to {}".format(self.numbering_mode))
 
     def __set_bag_numbers_to_valve_pin_numbers_dict(self, line):
         """
@@ -170,7 +171,7 @@ class HardwareConfiguration():
             valve_number = int(valve.strip())
             assert (validate.is_valid_GPIO_pin_number(valve_number, self.numbering_mode))
             self.bag_numbers_to_valve_pin_numbers_dict[bag_number] = valve_number
-        self.logger.info("configuration.py: set bag numbers to GPIO number dictionary to {}"
+        self.logger.info("hardware_configuration.py: set bag numbers to GPIO number dictionary to {}"
                          .format(self.bag_numbers_to_valve_pin_numbers_dict))
 
     def __set_pump_pin_number(self, pin):
@@ -180,7 +181,7 @@ class HardwareConfiguration():
         pin_number = int(pin)
         assert (validate.is_valid_GPIO_pin_number(pin_number, self.numbering_mode))
         self.pump_pin_number = pin_number
-        self.logger.info("configuration.py: set pump GPIO number to {}".format(self.pump_pin_number))
+        self.logger.info("hardware_configuration.py: set pump GPIO number to {}".format(self.pump_pin_number))
 
     def __set_diode_pin_number(self, pin):
         """
@@ -189,7 +190,7 @@ class HardwareConfiguration():
         pin_number = int(pin)
         assert (validate.is_valid_GPIO_pin_number(pin_number, self.numbering_mode))
         self.diode_pin_number = pin_number
-        self.logger.info("configuration.py: set diode GPIO pin number to {}".format(self.diode_pin_number))
+        self.logger.info("hardware_configuration.py: set diode GPIO pin number to {}".format(self.diode_pin_number))
 
     def get_identification_number(self):
         """
