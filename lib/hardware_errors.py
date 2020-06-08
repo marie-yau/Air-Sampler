@@ -16,7 +16,8 @@ class HardwareConfigurationFileError(Exception):
         self.message = message
 
     def __str__(self):
-        return "Invalid hardware configuration file ({}) - {}".format(self.file_path, self.message)
+        return "Invalid hardware configuration file ({})" \
+               "\n- {}".format(self.file_path, self.message)
 
 
 class HardwareConfigurationFileErrors(Exception):
@@ -46,7 +47,8 @@ class HardwareConfigurationError(Exception):
         self.message = message
 
     def __str__(self):
-        return "Invalid hardware configuration - {}".format(self.message)
+        return "Invalid hardware configuration " \
+               "\n- {}".format(self.message)
 
 
 if __name__ == "__main__":
