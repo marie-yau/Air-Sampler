@@ -105,12 +105,12 @@ class SamplerSchedule():
                 except:
                     error_messages.append("Line 1: Invalid header. "
                                           "Replace `{}` with `Bag number, Start filling, Stop filling`"
-                                          .format(header_line))
+                                          .format(header_line.strip()))
                 for line_number, line in enumerate(file, 2):
                     # if first character of `line` is `#`, the whole line is considered to be a comment and is skipped
                     if line[0] == "#":
                         continue
-                    elif line[0].strip() == "":
+                    if line[0].strip() == "":
                         continue
                     try:
                         bag_event = self.convert_line_to_bag_event(line)
@@ -319,15 +319,20 @@ class SamplerSchedule():
         return BagEvent(bag_number, time_on, time_off)
 
 if __name__ == "__main__":
-    # create logger
-    logging.basicConfig(filename="sampler_schedule.txt",
-                        format="%(asctime)s %(message)s",
+    logging.basicConfig(format="%(asctime)s %(message)s",
                         filemode="w",
                         level=logging.DEBUG)
-    logger = logging.getLogger()
 
-    file_path = "sample.txt"
-    sampler = SamplerSchedule(file_path, timedelta(seconds=5), timedelta(seconds=5), timedelta(seconds=10), logger)
+    logger = logging.getLogger("logger")
+    file_handler = logging.FileHandler("../logs/log_file.txt", mode="a")
+    logger.addHandler(file_handler)
+
+    user_logger = logging.getLogger("user logger")
+    user_file_handler = logging.FileHandler("../logs/user_log_file.txt", mode="a")
+    user_logger.addHandler(user_file_handler)
+
+    file_path = "../Tests/invalid_schedule.txt"
+    sampler = SamplerSchedule(file_path, timedelta(seconds=5), timedelta(seconds=5), timedelta(seconds=10), logger, user_logger)
 
     bag_schedule = sampler.get_complete_bag_schedule()
     print("\nComplete Bag Schedule")
