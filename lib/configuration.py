@@ -157,26 +157,26 @@ class Configuration():
 
     def get_diode_light_duration(self):
         """
-        :return: integer representing the number of seconds that diode stays turned on
+        :return: `timedelta` object representing the number of seconds that diode stays turned on
         """
         return self.diode_light_duration
 
     def get_pump_starts_before(self):
         """
-        :return: integer representing the number of seconds that the pump starts pumping before the valve opens
+        :return: `timedelta` object representing the number of seconds that the pump starts pumping before the valve opens
         """
         return self.pump_starts_before
 
     def get_pump_stops_after(self):
         """
-        :return: integer representing the number of seconds that the pump keeps pumping after the valve closes
+        :return: `timedelta` object representing the number of seconds that the pump keeps pumping after the valve closes
         """
         return self.pump_stops_after
 
     def get_pump_time_off_tolerance(self):
         """
-        :return: integer representing the number of seconds. If pump is supposed to turn off for less than specified
-        number of seconds, it will continue pumping.
+        :return: `timedelta` object representing the number of seconds. If pump is supposed to turn off for less than
+        specified number of seconds, it will continue pumping.
         """
         return self.pump_time_off_tolerance
 
