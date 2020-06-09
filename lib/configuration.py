@@ -53,9 +53,11 @@ class Configuration():
             with open(file_path, "r") as config_file:
                 lines = [line.strip() for line in config_file]
         except:
-            error_messages.append("Configuration file is missing. "
-                                  "Create a valid configuration file `{}` on the USB drive. "
+            self.user_logger.info("CONFIGURATION FILE")
+            self.user_logger.info("- Configuration file is missing. "
+                                  "\n + Create a valid configuration file `{}` on the USB drive. "
                                   .format(file_path.split("/")[-1]))
+            raise ConfigurationFileError(file_path, "Configuration file not found.")
 
         # diode light duration section
         try:
@@ -102,14 +104,10 @@ class Configuration():
                                           .format(i+1))
         # write error messages to log files
         if error_messages:
-            self.logger.info("-------------")
             self.user_logger.info("CONFIGURATION FILE")
-            self.logger.info("Configuration file")
             for msg in error_messages:
-                self.logger.info(msg)
                 self.user_logger.info(msg)
-            self.logger.info("-------------")
-            raise ConfigurationFileErrors(file_path, "Configuration file is missing or is in an invalid format.")
+            raise ConfigurationFileErrors(file_path, error_messages)
 
     def set_logger(self, logger):
         """
@@ -183,9 +181,19 @@ class Configuration():
         return self.pump_time_off_tolerance
 
 if __name__ == "__main__":
-    file_path = "../Tests/valid_configuration.txt"
+    file_path = "../Tests/invalid_configuration.txt"
+    logging.basicConfig(format="%(asctime)s %(message)s",
+                        filemode="w",
+                        level=logging.DEBUG)
+
     logger = logging.getLogger("logger")
+    file_handler = logging.FileHandler("../logs/log_file.txt", mode = "w")
+    logger.addHandler(file_handler)
+
     user_logger = logging.getLogger("user logger")
+    user_file_handler = logging.FileHandler("../logs/user_log_file.txt", mode = "w")
+    user_logger.addHandler(user_file_handler)
+
     configuration = Configuration(file_path, logger, user_logger)
 
     print("Diode light duration:", configuration.get_diode_light_duration())
