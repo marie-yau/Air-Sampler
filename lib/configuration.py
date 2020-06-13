@@ -48,7 +48,6 @@ class Configuration():
         error_messages = []
 
         # read lines of into a list and remove any leading and trailing white spaces
-        lines = []
         try:
             with open(file_path, "r") as config_file:
                 lines = [line.strip() for line in config_file]
@@ -180,8 +179,9 @@ class Configuration():
         """
         return self.pump_time_off_tolerance
 
+
 if __name__ == "__main__":
-    file_path = "../Tests/invalid_configuration.txt"
+    file_path = "../tests/invalid_configuration.txt"
     logging.basicConfig(format="%(asctime)s %(message)s",
                         filemode="w",
                         level=logging.DEBUG)

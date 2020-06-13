@@ -224,7 +224,7 @@ class HardwareConfiguration():
 
 
 if __name__ == "__main__":
-    file_path = "../Tests/valid_hardware_configuration_file.txt"
+    file_path = "../tests/valid_hardware_configuration_file.txt"
     logger = logging.getLogger()
     hardware_config = HardwareConfiguration(file_path, logger)
     print("ID: {}\nMode: {}\nBag numbers to valve pins: {}\nPump: {}\nDiode: {}"
