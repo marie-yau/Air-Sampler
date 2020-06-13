@@ -1,0 +1,8 @@
+Diode light duration
+3
+Number of seconds pump starts pumping before valve opens
+5
+Number of seconds pump continues pumping after valve closes
+5
+Pump time off tolerance in seconds
+10

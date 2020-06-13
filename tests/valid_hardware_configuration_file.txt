@@ -1,0 +1,10 @@
+Identification number
+9
+Numbering mode
+BCM
+Bag numbers to valve pin numbers
+1: 19, 2: 11
+Pump pin number
+13
+Diode pin number
+17
